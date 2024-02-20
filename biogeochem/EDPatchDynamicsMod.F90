@@ -283,6 +283,7 @@ contains
        currentPatch%disturbance_rates(dtype_ifall) = 0.0_r8
        currentPatch%disturbance_rates(dtype_ilog)  = 0.0_r8
        currentPatch%disturbance_rates(dtype_ifire) = 0.0_r8
+	   currentPatch%disturbance_rates(dtype_inmort) = 0.0_r8
 
        dist_rate_ldist_notharvested = 0.0_r8
        
@@ -699,7 +700,10 @@ contains
                          fnrt_c   = currentCohort%prt%GetState(fnrt_organ, carbon12_element)
                          store_c  = currentCohort%prt%GetState(store_organ, carbon12_element)
                          total_c  = sapw_c + struct_c + leaf_c + fnrt_c + store_c
-
+						 if(hlm_use_insect.eq.itrue)then
+	     	                 canopy_dead = currentCohort%n * &
+							 min(1.0_r8,(currentCohort%dmort + currentCohort%inmort) * hlm_freq_day * fates_mortality_disturbance_fraction)
+						 end if 
                          ! treefall mortality is the current disturbance
                          if(i_disturbance_type .eq. dtype_ifall) then
 
@@ -864,6 +868,7 @@ contains
                             nc%bmort            = currentCohort%bmort
                             nc%frmort           = currentCohort%frmort
                             nc%smort            = currentCohort%smort
+							nc%inmort           = currentCohort%inmort
                             nc%asmort           = currentCohort%asmort
                             nc%dgmort           = currentCohort%dgmort
                             nc%dmort            = currentCohort%dmort
@@ -959,6 +964,7 @@ contains
                                nc%bmort            = currentCohort%bmort
                                nc%frmort           = currentCohort%frmort
                                nc%smort            = currentCohort%smort
+							   nc%inmort           = currentCohort%inmort
                                nc%asmort           = currentCohort%asmort
                                nc%dgmort           = currentCohort%dgmort
                                nc%dmort            = currentCohort%dmort
@@ -1022,6 +1028,7 @@ contains
                                   nc%bmort            = currentCohort%bmort
                                   nc%frmort           = currentCohort%frmort
                                   nc%smort            = currentCohort%smort
+								  nc%inmort           = currentCohort%inmort
                                   nc%asmort           = currentCohort%asmort
                                   nc%dgmort           = currentCohort%dgmort
                                   nc%dmort            = currentCohort%dmort
@@ -1045,6 +1052,7 @@ contains
                                   nc%bmort            = currentCohort%bmort
                                   nc%frmort           = currentCohort%frmort
                                   nc%smort            = currentCohort%smort
+								  nc%inmort           = currentCohort%inmort
                                   nc%asmort           = currentCohort%asmort
                                   nc%dgmort           = currentCohort%dgmort
                                   nc%dmort            = currentCohort%dmort

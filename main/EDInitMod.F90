@@ -42,6 +42,7 @@ module EDInitMod
   use EDTypesMod                , only : phen_dstat_moiston
   use FatesInterfaceTypesMod         , only : bc_in_type,bc_out_type
   use FatesInterfaceTypesMod         , only : hlm_use_planthydro
+  use FatesInterfaceTypesMod         , only : hlm_use_insect
   use FatesInterfaceTypesMod         , only : hlm_use_inventory_init
   use FatesInterfaceTypesMod         , only : hlm_use_fixed_biogeog
   use FatesInterfaceTypesMod         , only : hlm_use_tree_damage
@@ -53,7 +54,8 @@ module EDInitMod
   use FatesInterfaceTypesMod         , only : nlevdamage
   use FatesInterfaceTypesMod         , only : hlm_use_nocomp
   use FatesInterfaceTypesMod         , only : nlevage
-
+  use FatesInsectMemMod         , only : ed_site_insect_type
+  use FatesInsectMemMod         , only : InitInsectSite, ZeroInsectSite
   use FatesAllometryMod         , only : h2d_allom
   use FatesAllometryMod         , only : bagw_allom
   use FatesAllometryMod         , only : bbgw_allom
@@ -155,7 +157,10 @@ contains
        allocate(site_in%fmort_cflux_canopy_damage(1,1))
        allocate(site_in%fmort_cflux_ustory_damage(1,1))
     end if
-
+    if(hlm_use_insect.eq.itrue) then
+        allocate(site_in%si_insect)
+        allocate(site_in%inmort_rate(1:nlevsclass,1:numpft))
+    endif
     allocate(site_in%term_carbonflux_canopy(1:numpft))
     allocate(site_in%term_carbonflux_ustory(1:numpft))
     allocate(site_in%imort_carbonflux(1:numpft))
@@ -537,7 +542,13 @@ contains
        enddo
 
        call initialize_sites_by_inventory(nsites,sites,bc_in)
-
+		
+	    ! Allocating and initializing insects at the site level.
+      	if(hlm_use_insect.eq.itrue) then
+		!allocate(sites(s)%si_insect)
+        	call InitInsectSite(sites(s)%si_insect)
+        endif
+		
 
        ! For carbon balance checks, we need to initialize the
        ! total carbon stock

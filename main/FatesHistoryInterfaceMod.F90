@@ -443,6 +443,7 @@ module FatesHistoryInterfaceMod
   integer :: ih_m9_si_scpf
   integer :: ih_m10_si_scpf
   integer :: ih_m11_si_scpf
+  integer :: ih_m12_si_scpf
   
   integer :: ih_crownfiremort_si_scpf
   integer :: ih_cambialfiremort_si_scpf

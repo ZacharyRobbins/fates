@@ -103,6 +103,11 @@ module FatesInterfaceTypesMod
                                                    ! host model is using vertically discretized
                                                    ! soil carbon
                                                    ! 1 = TRUE,  0 = FALSE
+   integer, public :: hlm_use_insect   	! This flag signals wheter or not to use insect disturbance.
+										! 1=True 0=False
+   
+   
+   
    
    integer, public :: hlm_spitfire_mode  ! Flag to signal SPITFIRE mode
                                          ! See namelist_definition_clm4_5.xml
@@ -686,7 +691,7 @@ module FatesInterfaceTypesMod
       real(r8), allocatable :: elai_pa(:)  ! exposed leaf area index
       real(r8), allocatable :: esai_pa(:)  ! exposed stem area index
       real(r8), allocatable :: tlai_pa(:)  ! total leaf area index
-      real(r8), allocatable :: tsai_pa(:)  ! total stem area index
+      real(r8), allocatable :: tsai_pa(:)  ! total stem area indebx
       real(r8), allocatable :: htop_pa(:)  ! top of the canopy [m]
       real(r8), allocatable :: hbot_pa(:)  ! bottom of canopy? [m]
 

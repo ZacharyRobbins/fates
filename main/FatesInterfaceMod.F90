@@ -458,7 +458,12 @@ contains
          allocate(bc_in%plant_no3_uptake_flux(1,1))
          allocate(bc_in%plant_p_uptake_flux(1,1))
       end if
-
+	  if (hlm_use_insect.eq.1)then
+		 allocate(bc_in%tgcm_max_pa(maxPatchesPerSite))
+		 allocate(bc_in%tgcm_min_pa(maxPatchesPerSite))
+         bc_in%tgcm_max_pa(:) = -999.0_r8
+         bc_in%tgcm_min_pa(:) = 999.0_r8
+	  end if 
 
       allocate(bc_in%zi_sisl(0:nlevsoil_in))
       allocate(bc_in%dz_sisl(nlevsoil_in))
@@ -1389,6 +1394,7 @@ contains
          hlm_sf_scalar_lightning_def = unset_int
          hlm_sf_successful_ignitions_def = unset_int
          hlm_sf_anthro_ignitions_def = unset_int
+		 hlm_use_insect = unset_int
          hlm_use_planthydro = unset_int
          hlm_use_lu_harvest   = unset_int
          hlm_num_lu_harvest_cats   = unset_int
@@ -1825,7 +1831,11 @@ contains
                if (fates_global_verbose()) then
                   write(fates_log(),*) 'Transfering hlm_use_logging= ',ival,' to FATES'
                end if
-
+	        case('use_insect')
+               hlm_use_insect = ival
+               if (fates_global_verbose()) then
+                  write(fates_log(),*) 'Transfering hlm_use_insect ',ival,' to FATES'
+               end if
             case('use_ed_st3')
                hlm_use_ed_st3 = ival
                if (fates_global_verbose()) then

@@ -122,7 +122,7 @@ module EDTypesMod
 
   ! BIOLOGY/BIOGEOCHEMISTRY        
   integer , parameter, public :: num_vegtemp_mem      = 10         ! Window of time over which we track temp for cold sensecence (days)
-  integer , parameter, public :: N_DIST_TYPES         = 3          ! Disturbance Modes 1) tree-fall, 2) fire, 3) logging
+  integer , parameter, public :: N_DIST_TYPES         = 4          ! Disturbance Modes 1) tree-fall, 2) fire, 3) logging
   integer , parameter, public :: dtype_ifall          = 1          ! index for naturally occuring tree-fall generated event
   integer , parameter, public :: dtype_ifire          = 2          ! index for fire generated disturbance event
   integer , parameter, public :: dtype_ilog           = 3          ! index for logging generated disturbance event
@@ -359,8 +359,8 @@ module EDTypesMod
      real(r8) ::  frmort                                 ! freezing mortality               n/year
      real(r8) ::  smort                                  ! senesence mortality              n/year
      real(r8) ::  asmort                                 ! age senescence mortality         n/year
-     real(r8) ::  dgmort                                  ! damage mortality                 n/year
-     
+     real(r8) ::  dgmort                                 ! damage mortality                 n/year
+     real(r8) ::  inmort			                     ! insect mortality		    		n/year
       ! Logging Mortality Rate 
       ! Yi Xu & M. Huang
      real(r8) ::  lmort_direct                           ! directly logging rate            fraction /per logging activity
@@ -559,7 +559,8 @@ module EDTypesMod
      ! DISTURBANCE 
      real(r8) ::  disturbance_rates(n_dist_types)                  ! disturbance rate from 1) mortality 
                                                                    !                       2) fire: fraction/day 
-                                                                   !                       3) logging mortatliy
+                                                                   !                       3) logging mortality
+																   !					   4) insect mortality 
      real(r8) ::  fract_ldist_not_harvested                        ! fraction of logged area that is canopy trees that weren't harvested
 
 
@@ -844,7 +845,9 @@ module EDTypesMod
      real(r8), allocatable :: term_carbonflux_ustory(:)  ! carbon flux from live to dead pools associated 
                                                          ! with termination mortality, per canopy level    
      real(r8), allocatable :: imort_carbonflux(:)        ! biomass of individuals killed due to impact mortality per year. [kgC/ha/day]
-     real(r8), allocatable :: fmort_carbonflux_canopy(:) ! biomass of canopy indivs killed due to fire per year. [gC/m2/sec]
+     real(r8) :: inmort_carbonflux                               ! biomass of individuals killed due to insect mortality per year. [kgC/ha/day]
+	
+	 real(r8), allocatable :: fmort_carbonflux_canopy(:) ! biomass of canopy indivs killed due to fire per year. [gC/m2/sec]
      real(r8), allocatable :: fmort_carbonflux_ustory(:) ! biomass of understory indivs killed due to fire per year [gC/m2/sec] 
 
      real(r8) :: demotion_carbonflux                     ! biomass of demoted individuals from canopy to understory [kgC/ha/day]
@@ -853,7 +856,7 @@ module EDTypesMod
      real(r8), allocatable :: demotion_rate(:)           ! rate of individuals demoted from canopy to understory per FATES timestep
      real(r8), allocatable :: promotion_rate(:)          ! rate of individuals promoted from understory to canopy per FATES timestep
      real(r8), allocatable :: imort_rate(:,:)            ! rate of individuals killed due to impact mortality per year.  on size x pft array
-     
+     real(r8), allocatable :: inmort_rate(:,:)                   ! rate of individuals killed due to insect mortality per year.  on size x pft array  
 
      real(r8), allocatable :: fmort_rate_canopy(:,:)     ! rate of canopy individuals killed due to fire mortality per year.  
                                                          ! on size x pft array  (1:nlevsclass,1:numpft)
