@@ -119,7 +119,7 @@ module FatesInsectMemMod
 	this%Transit(1:5) = 0.0_r8
 	this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
 	this%ColdestT = 0.0_r8
-	this%FebInPopn = 0.0_r8
+	this%In_PopN   = 0.0_r8
 	! As model runs typically start January 1, 
 	! I have decided to initialize with non-reactive temperatures for insects.
 	this%MaxDailyT = 0.0_r8
