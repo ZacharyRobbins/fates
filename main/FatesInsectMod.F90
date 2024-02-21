@@ -259,7 +259,7 @@ integer :: NumPatches
 					NtGEQ317 > 0.0_r8 .and. Ntm1GEQ317 > NtGEQ317)then
 						currentCohort%inmort = (1.0_r8 - NtGEQ317/Ntm1GEQ317)*365.0_r8				
 					elseif(In_PopN > EndPopn .and. currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. &
-					currentCohort%dbh <=10.0_r8 NtGEQ00 > 0.0_r8 .and. Ntm1GEQ00 > NtGEQ00) then
+					currentCohort%dbh <=10.0_r8 .and. NtGEQ00 > 0.0_r8 .and. Ntm1GEQ00 > NtGEQ00) then
 						currentCohort%inmort = (1.0_r8 - NtGEQ00/Ntm1GEQ00)*365.0_r8	
 					else
 					currentCohort%inmort = 0.0_r8
@@ -377,7 +377,7 @@ integer :: NumPatches
 		real(r8), intent(in) :: FecMax 
 		real(r8), intent(in) :: Gen_mort 
 		real(r8), intent(in) :: Mort_Fec
-		real(r8), intent(in) :: 
+		real(r8), intent(in) :: Mort_ETP
 		real(r8), intent(in) :: Mort_Ads 
 		real(r8), intent(in) :: FFTL
 		real(r8), intent(in) :: FFTH 
@@ -407,7 +407,7 @@ integer :: NumPatches
 		real(kind = 8), parameter :: DeltaM0 = 2.0
 		real(kind = 8), parameter :: omega0 = .0085
 		real(kind = 8), parameter :: psi0 = 0.013
-	   ! parameters for development rate for eggs
+	       ! parameters for development rate for eggs
 		real(kind = 8), parameter :: sigma1=.2822   
 		real(kind = 8), parameter :: Rmax1=0.184          
 		real(kind = 8), parameter :: Tmax1=37.150
@@ -445,7 +445,7 @@ integer :: NumPatches
 		! Waiting eight days to begin ovipositing
 		real(kind = 8), parameter :: medA = .125
 		real(kind = 8), parameter :: sigmaA = .01
-		 ! Here are variables to hold the buffered under bark temperatures
+		! Here are variables to hold the buffered under bark temperatures
 		real(kind = 8) :: Tmeanall    
 		real(kind = 8) :: Cmean             ! mean of current day
 		real(kind = 8) :: Cmean2 	    ! Mean of next half
@@ -462,8 +462,8 @@ integer :: NumPatches
 		real(kind = 8) :: Tmin2     ! the buffered under-bark minimum temperature
 		real(kind = 8) :: Tmax2     ! the warmer under bark maximum temperature
 
-
-	   ! Variables that relate to the domain of the lognormal distribution
+ 
+	       ! Variables that relate to the domain of the lognormal distribution
 		integer(kind = 4), parameter :: n = 2**8    ! input variable. Must be specified
 		real(kind = 8), parameter :: Mx = 2.0
 		real(kind = 8), parameter :: Mn = 1.0e-20
@@ -565,8 +565,8 @@ integer :: NumPatches
 		real(r8) :: NewA
 
 
-
-	! The mean between Tmin(4am) and Tmax(4pm)
+!---------------Empirical transformation of air temperature to under bark temperature Ponderosa pine---------!
+	        ! The mean between Tmin(4am) and Tmax(4pm)
 		CMean=(max_airTC+min_airTC)/2
 		! The mean between Tmax(4pm) and TminNext (4am the following day)
 		CMean2=(max_airTC+min_airTC)/2
@@ -574,15 +574,15 @@ integer :: NumPatches
 		CDif=(max_airTC-min_airTC)
 		! The difference between Tmax and T min Next 
 		CDif2=(max_airTC-min_airTC)
-		! This is the implementation of the Ssine Cycle for each of the time periods in the model. 
+		! This is the implementation of the Sine Cycle for each of the time periods in the model. 
 		fouram=3.8532+(min_airTC*.9677)
-		sevenam=1.86978+(.93522*(CMean+(.5*CDif*-0.7071068)))
+		sevenam=1.86978+(.93522*(CMean+(.5*CDif*(-0.7071068))))
 		tenam=(-.4533)+(1.00899*(CMean))
 		onepm=(-1.148846)+(.985801*(CMean+(.5*CDif*0.7071068)))
 		fourpm=(.0656866)+(.942395*(CMean+(.5*CDif*1)))
 		sevenpm=(-0.702683)+(.979172*(CMean2+(.5*CDif2*0.7071068)))
 		tenpm=.934665+(.988126*(CMean2))
-		oneam=3.2294+(.9842*(CMean2+(.5*CDif2*-0.7071068)))		
+		oneam=3.2294+(.9842*(CMean2+(.5*CDif2*(-0.7071068))))		
 
 
 		! Computing the median development rate for each life stage in this time step
@@ -686,7 +686,7 @@ integer :: NumPatches
 		! This prevents them from killing trees when they shouldn't be.
 	!	 If temperatures are cold, all of the flying beetles die. This prevents them
 		! from killing trees when they should not be. The value of -10*C is from Miller and Keen 
-		if(Tmin < -10.0)then
+		if(min_airTC < -10.0)then
 			Bt = 0.0
 			FA = 0.0
 		end if
