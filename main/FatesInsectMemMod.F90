@@ -1,9 +1,9 @@
 module FatesInsectMemMod
 
 	!use EDParamsMod             , only : insect_an
-
+	use FatesConstantsMod     , only : r8 => fates_r8
 	implicit none
-	integer,parameter insectType= 2  	! 1= MPB, 2=WPB 3=OtherType.
+	integer insectType= 2  	! 1= MPB, 2=WPB 3=OtherType.
 
 	! Here are input parameter for the MPBAttack subroutine
 	! Need to move these parameters into the parameter file
