@@ -35,7 +35,7 @@ contains
     !  The insect model is called at the site level, and all of the insect-
     !  related state variables are stored at the site level (see FatesInsectMemMod)
     !
-    use FatesInterfaceMod    , only : bc_in_type
+    use FatesInterfaceTypesMod     , only : bc_in_type
     use EDtypesMod           , only : ed_site_type, ed_patch_type, ed_cohort_type
     ! !ARGUMENTS:
     type(ed_site_type)      , intent(inout), target  :: currentSite
@@ -58,7 +58,7 @@ contains
     ! The mountain pine beetle model.
     !			
     use FatesInsectMemMod    , only : ed_site_insect_type
-    use FatesInterfaceMod    , only : hlm_current_year, hlm_current_month, hlm_current_day, hlm_freq_day, bc_in_type
+    use FatesInterfaceTypesMod  , only : hlm_current_year, hlm_current_month, hlm_current_day, hlm_freq_day, bc_in_type
     use EDtypesMod           , only : ed_patch_type, ed_cohort_type
 
     ! !ARGUMENTS:
