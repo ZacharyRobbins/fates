@@ -13,53 +13,30 @@ module FatesInsectMemMod
 	integer,  parameter :: numberInsectTypes = 1                  	! number of insect types (currently only one-mountain pine beetle)
 	integer,  parameter :: maxNumStages   = 20                    	! maximum number of stages for insect development
 	integer,  parameter :: maxpft = 14					! maximum number of plant pfts (I've manually entered the current number, which is inelegant...)
-						! 1= MPB, 2=WPB 3=OtherType. 
-    ! Here are input parameter for each species subroutine
-    	select case (insectType)
-		case(1)
-			real(r8), parameter :: an = -11.462723_r8			        ! controls tree loss rate as a function of beetle and tree density
-			real(r8), parameter :: ab = -5.599606_r8				! controls proportion of beetles that attack
-			real(r8), parameter :: alpha3 = -35.4185_r8				! The temperature in degrees centigrade at which only 50 % survival occurs
-			real(r8), parameter :: Beta3 = 2.0_r8				! controls the rate of change of survival probability as a function of temperature 
-			real(r8), parameter :: EndPopn= 40.0_r8
-			real(r8), parameter :: Ofmax = 54.67_r8
-			real(r8), parameter :: ONetp = .2526481_r8
-			real(r8), parameter :: Otm2 = -18.0_r8    !!! update to WPB files.
-			real(r8), parameter :: ETPT = -18.0_r8 
-			real(r8), parameter :: ADSRT, = -18.0_r8
-			real(r8), parameter :: FFTL = 17.53_r8
-			real(r8), parameter :: FFTH = 42.00_r8
-			real(r8), parameter :: FF1 = 25.00_r8 
-			real(r8), parameter :: FF2 = -5.324_r8
-			real(r8), parameter :: FF3 = 4.277e-01_r8
-			real(r8), parameter :: FF4 = -1.633e-02_r8
-			real(r8), parameter :: FF5 = 3.014e-04_r8
-			real(r8), parameter :: FF6 = -2.172e-06_r8
+
 			
-		case(2)
-			real(r8), parameter :: r1 = 0.2009 			        ! controls tree loss rate as a function of beetle and tree density
-			real(r8), parameter :: x0 = 10.03 				! controls proportion of beetles that attack
-			real(r8), parameter :: x1 = 1.545			! The temperature in degrees centigrade at which only 50 % survival occurs
-			real(r8), parameter :: CWDvec = 2.0_r8				! controls the rate of change of survival probability as a function of temperature 
-			real(r8), parameter :: x2 = 0.506_r8
-			real(r8), parameter :: SizeFactor = 0.051_r8
-			real(r8), parameter :: EndPopn= 840.0_r8
-			real(r8), parameter :: FecMax = 24_r8
-			real(r8), parameter :: FecMortR = .142857_r8
-			real(r8), parameter :: Mort_Fec = -12.2_r8
-			real(r8), parameter :: Mort_ETP = -15.0_r8 
-			real(r8), parameter :: Mort_Ads = -12.2_r8
-			real(r8), parameter :: FFTL = 18.6_r8
-			real(r8), parameter :: FFTH = 38.9_r8
-			real(r8), parameter :: FF1 = -1.29873473_r8 
-			real(r8), parameter :: FF2 = 0.1090086_r8
-			real(r8), parameter :: FF3 = -0.0019475_r8
-			real(r8), parameter :: FF4 = 0.0_r8
-			real(r8), parameter :: FF5 =0.0_r8 
-			real(r8), parameter :: FF6 =0.0_r8 
-		case default
-			fates_endrun("Missing InsectType Parameter")
-		end select 
+		
+	real(r8), parameter :: r1 = 0.2009 			        ! controls tree loss rate as a function of beetle and tree density
+	real(r8), parameter :: x0 = 10.03 				! controls proportion of beetles that attack
+	real(r8), parameter :: x1 = 1.545			! The temperature in degrees centigrade at which only 50 % survival occurs
+	real(r8), parameter :: CWDvec = 2.0_r8				! controls the rate of change of survival probability as a function of temperature 
+	real(r8), parameter :: x2 = 0.506_r8
+	real(r8), parameter :: SizeFactor = 0.051_r8
+	real(r8), parameter :: EndPopn= 840.0_r8
+	real(r8), parameter :: FecMax = 24_r8
+	real(r8), parameter :: FecMortR = .142857_r8
+	real(r8), parameter :: Mort_Fec = -12.2_r8
+	real(r8), parameter :: Mort_ETP = -15.0_r8 
+	real(r8), parameter :: Mort_Ads = -12.2_r8
+	real(r8), parameter :: FFTL = 18.6_r8
+	real(r8), parameter :: FFTH = 38.9_r8
+	real(r8), parameter :: FF1 = -1.29873473_r8 
+	real(r8), parameter :: FF2 = 0.1090086_r8
+	real(r8), parameter :: FF3 = -0.0019475_r8
+	real(r8), parameter :: FF4 = 0.0_r8
+	real(r8), parameter :: FF5 =0.0_r8 
+	real(r8), parameter :: FF6 =0.0_r8 
+
 !-------------------------------------------------------------------------------------------------------------------------------
     ! Defining a site-level type from which to obtain variables.
     type ed_site_insect_type
