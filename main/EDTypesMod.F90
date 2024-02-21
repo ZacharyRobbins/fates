@@ -6,6 +6,7 @@ module EDTypesMod
   use FatesGlobals,          only : fates_log
   use FatesHydraulicsMemMod, only : ed_cohort_hydr_type
   use FatesHydraulicsMemMod, only : ed_site_hydr_type
+  use FatesInsectMemMod,     only : ed_site_insect_type
   use PRTGenericMod,         only : prt_vartypes
   use PRTGenericMod,         only : leaf_organ, fnrt_organ, sapw_organ
   use PRTGenericMod,         only : repro_organ, store_organ, struct_organ
@@ -754,7 +755,10 @@ ed_site_type
      
      ! Mass Balance (allocation for each element)
 
-     type(site_massbal_type), pointer :: mass_balance(:)
+     type(site_massbal_type), pointer :: mass_balance(:) 
+
+     ! Insects!
+     type(ed_site_insect_type), pointer :: si_insect ! State vars at the site level : see FatesInsectMemMod.F90
 
      ! Flux diagnostics (allocation for each element)
 
