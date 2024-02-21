@@ -61,7 +61,7 @@ module FatesInsectMemMod
 	
         ! Variables related to mountain pine beetle winter survival (these are specific to the mountain pine beetle)
         real(r8) :: ColdestT                         			! coldest winter temperature experienced to date (resets on a yearly basis)
-	real(r8) :: FebInPopn                         			! a cencus of population that is used to decide whether insects attack trees
+	real(r8) :: In_PopN                         			! a cencus of population that is used to decide whether insects attack trees
 	
 	! Maximum and minimum daily temperatures in degree C
 	real(r8) :: MaxDailyT                         			
