@@ -5,7 +5,11 @@ module FatesInsectMod
   use EDtypesMod                , only : ed_site_type, ed_patch_type, ed_cohort_type
   use FatesInsectMemMod         , only : ed_site_insect_type, numberInsectTypes
   !use EDParamsMod               , only : insect_an
-
+  use FatesInsectMemMod, only : r1,x0,x1,CWDvec,x2
+  use FatesInsectMemMod, only : SizeFactor,EndPopn,FecMax,Gen_mort
+  use FatesInsectMemMod, only : Mort_Fec,Mort_ETP,Mort_Ads,
+  use FatesInsectMemMod, only : FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6
+			
   ! !PUBLIC MEMBER FUNCTIONS:
   public  :: insect_model
   ! !PRIVATE MEMBER FUNCTIONS:
@@ -85,9 +89,7 @@ contains
 !=====   Start WPB Processor===================
 !!!=====================================================================================
 		case(2)
-			use FatesInsectMemMod, only : r1,x0,x1,CWDvec,x2,SizeFactor,EndPopn,FecMax,Gen_mort,&
-			Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6
-			
+
 			! InitInsectSite subroutine these will be allocated with size equal to the domain size.
 			real(r8) :: OE(2**8)           	! vector to hold physiological age distribution for eggs
 			real(r8) :: OL1(2**8)          	! vector to hold physiological age distribution for first instar larvae
