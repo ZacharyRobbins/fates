@@ -83,26 +83,20 @@ contains
     real(r8) :: min_airTC                   	! minimum daily air temperature (degrees C) in the site at reference height
 
     !! Below are state variables that we track at the site level.
-	select case(insectType)
-    		
-!!!=====================================================================================
-!=====   Start WPB Processor===================
-!!!=====================================================================================
-		case(2)
-
-			! InitInsectSite subroutine these will be allocated with size equal to the domain size.
-			real(r8) :: OE(2**8)           	! vector to hold physiological age distribution for eggs
-			real(r8) :: OL1(2**8)          	! vector to hold physiological age distribution for first instar larvae
-			real(r8) :: OL2(2**8)          	! vector to hold physiological age distribution for second instar larvae
-			real(r8) :: OP(2**8)           	! vector to hold physiological age distribution for pupae
-			real(r8) :: OT(2**8)           	! vector to hold physiological age distribution for teneral adults
-			real(r8) :: OPare(2**8)           	! vector to hold physiological age distribution for teneral adults
-			real(r8) :: NewEggstm1                  	! density of new eggs oviposited in the previous time step(t minus 1)
-			real(r8) :: NewParentstm1
-			real(r8) :: NewL1tm1                    	! density of new L1 in the previous time step (t minus 1)
-			real(r8) :: NewL2tm1                    	! density of new L2 in the previous time step (t minus 1)
-			real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
-			real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
+	
+    ! InitInsectSite subroutine these will be allocated with size equal to the domain size.
+    real(r8) :: OE(2**8)           	! vector to hold physiological age distribution for eggs
+    real(r8) :: OL1(2**8)          	! vector to hold physiological age distribution for first instar larvae
+    real(r8) :: OL2(2**8)          	! vector to hold physiological age distribution for second instar larvae
+    real(r8) :: OP(2**8)           	! vector to hold physiological age distribution for pupae
+    real(r8) :: OT(2**8)           	! vector to hold physiological age distribution for teneral adults
+    real(r8) :: OPare(2**8)           	! vector to hold physiological age distribution for teneral adults
+    real(r8) :: NewEggstm1                  	! density of new eggs oviposited in the previous time step(t minus 1)
+    real(r8) :: NewParentstm1
+    real(r8) :: NewL1tm1                    	! density of new L1 in the previous time step (t minus 1)
+    real(r8) :: NewL2tm1                    	! density of new L2 in the previous time step (t minus 1)
+    real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
+    real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
 
 			real(r8) :: Fec                         	! the expected number of pre-eggs at each time per ha
 			real(r8) :: E                           	! the expected number of eggs at each time per ha
@@ -128,7 +122,14 @@ contains
 			! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
 			real(r8) :: FebInPopn         		! current total population of insects estimated on Feb. first (before they would fly)
 			!real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
-			!Parameter above now intialized in InsectMemMod
+			!Parameter above now intialized in InsectMemMod 		
+!!!=====================================================================================
+!=====   Start WPB Processor===================
+!!!=====================================================================================
+		select case(insectType)
+		case(2)
+
+
 			
 			! number of patches in the site
 			integer :: NumPatches
@@ -167,7 +168,7 @@ contains
 			FebInPopn = currentSite%si_insect%FebInPopn
 			
 			NtGEQ317 = 0.0_r8
-			NtGEQ00=0.0_r8
+			NtGEQ00 = 0.0_r8
 			NumPatches = 0
 			max_airTC = 0.0_r8
 			min_airTC = 0.0_r8
@@ -247,18 +248,17 @@ contains
 			
 			do while (associated(currentPatch))
 				currentCohort => currentPatch%tallest
-
 				! Note that insect mortality is greater than zero only if the beetle population is
 				! larger than the epidemic beetle population. Otherwise beetles only colonize trees
 				! that were already killed by other mortality causes so insect mortality is effectively zero.
 				do while(associated(currentCohort)) ! cycling through cohorts from tallest to shortest
 					! Below I compute the tree mortality rate (n/ha/year) in each of the size classes
 					! used in the current version of the insect mortality model.
-			
 					! Here is the 20+ cm dbh size class we use in the model.
-				! In each dbhclass we multiply the daily probability of mortality by 365.0_r8
-				! to the mortality rate on a yearly basis. !!ZR-this seems weird
-					if(FebInPopn > EndPopn .and. currentCohort%pft == 2 .and. and. currentCohort%dbh >= 31.6_r8 .and.&
+					! In each dbhclass we multiply the daily probability of mortality by 365.0_r8
+					! to the mortality rate on a yearly basis. !!ZR-this seems weird
+					
+	1				if(FebInPopn > EndPopn .and. currentCohort%pft == 2 .and. and. currentCohort%dbh >= 31.6_r8 .and.&
 					NtGEQ317 > 0.0_r8 .and. Ntm1GEQ317 > NtGEQ317)then
 						currentCohort%inmort = (1.0_r8 - NtGEQ317/Ntm1GEQ317)*365.0_r8				
 					elseif(FebInPopn > EndPopn .and. currentCohort%pft == 2 ..and. currentCohort%dbh <= 31.6_r8 .and. &
@@ -277,8 +277,7 @@ contains
 			end do ! This ends the patch do loop
 						!----------------------------------------------------------------------------------------------------
 			!assign the updated values to the array for storage
-
-			! Mountain pine beetle densities in each life stage
+			! Densities in each life stage
 			currentSite%si_insect%indensity(1,1) = Fec
 			currentSite%si_insect%indensity(1,2) = E
 			currentSite%si_insect%indensity(1,3) = L1
