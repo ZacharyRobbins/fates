@@ -109,6 +109,7 @@ contains
     real(r8) :: Bt                		! beetles that remain in flight from the previous step per ha
     real(r8) :: Parents                     	! density of parent beetles in the current time step per ha
     real(r8) :: Pare                     	! density of parent beetles in the current time step per ha
+    real(r8) :: ActiveParents                    ! density of parent beetles in the current time step per ha
 	
 			! related to the winter mortality model for mountain pine beetle:
     real(r8) :: ColdestT                       	! Coldest yearly temperature experienced to date.
