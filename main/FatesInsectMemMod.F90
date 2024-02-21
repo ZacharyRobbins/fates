@@ -16,26 +16,26 @@ module FatesInsectMemMod
 
 			
 		
-	real(r8), parameter :: r1 = 0.2009 			        ! controls tree loss rate as a function of beetle and tree density
-	real(r8), parameter :: x0 = 10.03 				! controls proportion of beetles that attack
-	real(r8), parameter :: x1 = 1.545			! The temperature in degrees centigrade at which only 50 % survival occurs
+	real(r8), parameter :: r1 = 0.2009 			        ! Effective population of attack (portion of beetles to reach attacked tree). 
+	real(r8), parameter :: x0 = 10.03 				! Controls the intercept of the attack function
+	real(r8), parameter :: x1 = 1.545			        ! Value of SPI-4yr used to measure drought
 	real(r8), parameter :: CWDvec = 2.0_r8				! controls the rate of change of survival probability as a function of temperature 
-	real(r8), parameter :: x2 = 0.506_r8
-	real(r8), parameter :: SizeFactor = 0.051_r8
-	real(r8), parameter :: EndPopn= 840.0_r8
-	real(r8), parameter :: FecMax = 24_r8
-	real(r8), parameter :: FecMortR = .142857_r8
-	real(r8), parameter :: Mort_Fec = -12.2_r8
-	real(r8), parameter :: Mort_ETP = -15.0_r8 
-	real(r8), parameter :: Mort_Ads = -12.2_r8
-	real(r8), parameter :: FFTL = 18.6_r8
-	real(r8), parameter :: FFTH = 38.9_r8
-	real(r8), parameter :: FF1 = -1.29873473_r8 
-	real(r8), parameter :: FF2 = 0.1090086_r8
-	real(r8), parameter :: FF3 = -0.0019475_r8
-	real(r8), parameter :: FF4 = 0.0_r8
-	real(r8), parameter :: FF5 =0.0_r8 
-	real(r8), parameter :: FF6 =0.0_r8 
+	real(r8), parameter :: x2 = 0.506_r8                            ! The parameter of the relative influence of tree size class
+	real(r8), parameter :: SizeFactor = 0.051_r8                    ! parameter that controls the relative attraction to the large size class
+	real(r8), parameter :: EndPopn= 840.0_r8                        !Reset population 
+	real(r8), parameter :: FecMax = 24_r8				! Maximum fecundity
+	real(r8), parameter :: Gen_mort = .142857_r8			! Background mortality rate 
+	real(r8), parameter :: Mort_Fec = -12.2_r8			! Temperature threshold for overwintering adults.  Otm2
+	real(r8), parameter :: Mort_ETP = -15.0_r8 			! Temperature threshold for EPT death. 
+	real(r8), parameter :: Mort_Ads = -12.2_r8			! mortality rate ADS
+	real(r8), parameter :: FFTL = 18.6_r8                           !min temp of flight
+	real(r8), parameter :: FFTH = 38.9_r8                           ! max temp of fligh
+	real(r8), parameter :: FF1 = -1.29873473_r8 			! flight shape 1
+	real(r8), parameter :: FF2 = 0.1090086_r8 			! flight shape 2
+	real(r8), parameter :: FF3 = -0.0019475_r8			! flight shape 3
+	real(r8), parameter :: FF4 = 0.0_r8				! flight shape 4
+	real(r8), parameter :: FF5 =0.0_r8 				! flight shape 5
+	real(r8), parameter :: FF6 =0.0_r8 				! flight shape 6
 
 !-------------------------------------------------------------------------------------------------------------------------------
     ! Defining a site-level type from which to obtain variables.
