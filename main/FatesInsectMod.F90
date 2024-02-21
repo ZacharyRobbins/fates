@@ -308,8 +308,6 @@ integer :: NumPatches
 			currentSite%si_insect%MaxDailyT = max_airTC
 			currentSite%si_insect%MinDailyT = min_airTC
 		!! In case of no case 
-		case default
-			fates_endrun("Missing InsectType Parameter")
 		end select
 	end subroutine beetle_model
 ! Western Pine Beetle only functions 
@@ -373,7 +371,6 @@ integer :: NumPatches
 		real(r8), intent(in) :: x1 	      	      	   ! The parameter of drought influence in attack function
 		real(r8), intent(in) :: x2                     ! The parameter of the relative influence of tree size class
 		real(r8), intent(in) :: SizeFactor             ! parameter that controls the relative attraction to the large size class
-		real(r8), intent(in) :: Initparents			   ! Initializing population.
 		real(r8), intent(in) :: FecMax 
 		real(r8), intent(in) :: Gen_mort 
 		real(r8), intent(in) :: Mort_Fec
