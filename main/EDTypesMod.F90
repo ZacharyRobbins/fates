@@ -126,7 +126,7 @@ module EDTypesMod
   integer , parameter, public :: dtype_ifall          = 1          ! index for naturally occuring tree-fall generated event
   integer , parameter, public :: dtype_ifire          = 2          ! index for fire generated disturbance event
   integer , parameter, public :: dtype_ilog           = 3          ! index for logging generated disturbance event
-
+  integer , parameter, public :: dtype_inmort           = 4          ! index for logging generated disturbance event
   ! Phenology status flag definitions (cold type is cstat, dry type is dstat)
 
   integer, parameter, public :: phen_cstat_nevercold = 0        ! This (location/plant) has not experienced a cold period over a large number
