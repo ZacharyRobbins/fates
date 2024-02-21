@@ -92,8 +92,8 @@ contains
     real(r8) :: OT(2**8)           	! vector to hold physiological age distribution for teneral adults
     real(r8) :: OPare(2**8)           	! vector to hold physiological age distribution for teneral adults
     real(r8) :: NewEggstm1                  	! density of new eggs oviposited in the previous time step(t minus 1)
-    real(r8) :: NewParentstm1
-    real(r8) :: NewL1tm1                    	! density of new L1 in the previous time step (t minus 1)
+    real(r8) :: NewParentstm1                   ! density ofparents  in the previous time step (t minus 1)
+    real(r8) :: NewL1tm1                     	! density of new L1 in the previous time step (t minus 1)
     real(r8) :: NewL2tm1                    	! density of new L2 in the previous time step (t minus 1)
     real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
     real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
@@ -120,7 +120,8 @@ real(r8) :: NtGEQ00
 real(r8) :: Ntm1GEQ317            		! previous susceptible host trees in the 20+ cm dbh size class
 real(r8) :: Ntm1GEQ00
 ! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
-real(r8) :: In_PopN         		! current total population of insects estimated on Feb. first (before they would fly)
+real(r8) :: In_PopN         		! current total population of insects estimated on Oct first (end of flight season)
+integer :: NumPatches
 !real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
 !Parameter above now intialized in InsectMemMod 		
 !!!=====================================================================================
@@ -132,7 +133,7 @@ real(r8) :: In_PopN         		! current total population of insects estimated on
 
 			
 			! number of patches in the site
-			integer :: NumPatches
+			
 			
 			OE = currentSite%si_insect%PhysAge(:,1)
 			OL1 = currentSite%si_insect%PhysAge(:,2)
@@ -180,24 +181,25 @@ real(r8) :: In_PopN         		! current total population of insects estimated on
 				iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
 				currentCohort => currentPatch%tallest
 			
-			! Computing patch numbers
-			NumPatches = NumPatches + 1
+				! Computing patch numbers
+				NumPatches = NumPatches + 1
 			
-			! Computing mean temperature averaged across all patches (normalized later)
-			max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
-			min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
-			
-			!!!This was altered to allow for the two cohorts, needed in the WPB model.
-			if(currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8)then
+				! Computing mean temperature averaged across all patches (normalized later)
+				max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
+				min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
+		        	do while (associated(currentCohort))
+	
+					!!!This was altered to allow for the two cohorts, needed in the WPB model.
+					if(currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8)then
 						NtGEQ317 = NtGEQ317 + currentCohort%n*(currentPatch%area/10000.0_r8)
-			end if
-			if(currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. currentCohort%dbh <=10.0_r8)then
+					end if
+					if(currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. currentCohort%dbh <=10.0_r8)then
 						NtGEQ00 = NtGEQ00 + currentCohort%n*(currentPatch%area/10000.0_r8)
-			end if
-				currentCohort => currentCohort%shorter
+					end if
+					currentCohort => currentCohort%shorter
 
-			end do ! This ends the cohort do loop
-			currentPatch => currentPatch%younger
+				end do ! This ends the cohort do loop
+				currentPatch => currentPatch%younger
 			
 			end do	! Patch do loop
 			
@@ -219,14 +221,9 @@ real(r8) :: In_PopN         		! current total population of insects estimated on
 			
 			! In the case of beetle extinction, we re-initialize the parent beetle population with
 			! a small number (endemic beetle population level) of parent beetles. We count the
-			! population in February so that we know that none have flown yet, but if it is exceedingly
-			! small, we re-initialize with parents on July 21 of the same year.
+			! population in October, and if below endemic levels we reset it. 
 			if(hlm_current_month == 10 .and. hlm_current_day == 1) then
-				! We need to apply winter martality to the larvae even though it might not have been applied yet
-			! in the model (it is only applied after larvae develop into pupae to account for all temperatures
-			! experienced by developing larvae).
 				In_PopN = Fec + E + (L1 + L2 + L3 + L4)+ P + Te + A
-			
 			end if
 			if(hlm_current_month == 10 .and. hlm_current_day == 1 .and. In_PopN < EndPopn) then
 				! The endemic western pine beetle population because the parents of a new cohort.  
@@ -258,11 +255,11 @@ real(r8) :: In_PopN         		! current total population of insects estimated on
 					! In each dbhclass we multiply the daily probability of mortality by 365.0_r8
 					! to the mortality rate on a yearly basis. !!ZR-this seems weird
 					
-	1				if(In_PopN > EndPopn .and. currentCohort%pft == 2 .and. and. currentCohort%dbh >= 31.6_r8 .and.&
+	 				if(In_PopN > EndPopn .and. currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8 .and.&
 					NtGEQ317 > 0.0_r8 .and. Ntm1GEQ317 > NtGEQ317)then
 						currentCohort%inmort = (1.0_r8 - NtGEQ317/Ntm1GEQ317)*365.0_r8				
-					elseif(In_PopN > EndPopn .and. currentCohort%pft == 2 ..and. currentCohort%dbh <= 31.6_r8 .and. &
-					currentCohort%dbh <=10.0_r8 NtGEQ00 > 0.0_r8 .and. Ntm1GEQ00 > NtGEQ00)then
+					elseif(In_PopN > EndPopn .and. currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. &
+					currentCohort%dbh <=10.0_r8 NtGEQ00 > 0.0_r8 .and. Ntm1GEQ00 > NtGEQ00) then
 						currentCohort%inmort = (1.0_r8 - NtGEQ00/Ntm1GEQ00)*365.0_r8	
 					else
 					currentCohort%inmort = 0.0_r8
