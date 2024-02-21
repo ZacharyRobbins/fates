@@ -29,6 +29,7 @@ module EDPatchDynamicsMod
   use EDTypesMod           , only : dtype_ifall
   use EDTypesMod           , only : dtype_ilog
   use EDTypesMod           , only : dtype_ifire
+  use EDTypesMod           , only : dtype_inmort
   use EDTypesMod           , only : ican_upper
   use PRTGenericMod        , only : num_elements
   use PRTGenericMod        , only : element_list
@@ -49,6 +50,7 @@ module EDPatchDynamicsMod
   use FatesInterfaceTypesMod    , only : hlm_use_nocomp
   use FatesInterfaceTypesMod    , only : hlm_use_fixed_biogeog
   use FatesInterfaceTypesMod    , only : hlm_num_lu_harvest_cats
+  use FatesInterfaceTypesMod    , only : hlm_use_insect
   use FatesGlobals         , only : endrun => fates_endrun
   use FatesConstantsMod    , only : r8 => fates_r8
   use FatesConstantsMod    , only : itrue, ifalse
@@ -700,10 +702,10 @@ contains
                          fnrt_c   = currentCohort%prt%GetState(fnrt_organ, carbon12_element)
                          store_c  = currentCohort%prt%GetState(store_organ, carbon12_element)
                          total_c  = sapw_c + struct_c + leaf_c + fnrt_c + store_c
-						 if(hlm_use_insect.eq.itrue)then
-	     	                 canopy_dead = currentCohort%n * &
-							 min(1.0_r8,(currentCohort%dmort + currentCohort%inmort) * hlm_freq_day * fates_mortality_disturbance_fraction)
-						 end if 
+			 if(hlm_use_insect.eq.itrue)then
+	     	                 currentCohort%n = currentCohort%n * &
+							 min(1.0_r8,(currentCohort%inmort) * hlm_freq_day * fates_mortality_disturbance_fraction)
+			 end if 
                          ! treefall mortality is the current disturbance
                          if(i_disturbance_type .eq. dtype_ifall) then
 

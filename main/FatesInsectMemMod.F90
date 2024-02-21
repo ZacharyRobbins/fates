@@ -3,7 +3,6 @@ module FatesInsectMemMod
 	!use EDParamsMod             , only : insect_an
 	use FatesConstantsMod     , only : r8 => fates_r8
 	implicit none
-	integer insectType= 2  	! 1= MPB, 2=WPB 3=OtherType.
 
 	! Here are input parameter for the MPBAttack subroutine
 	! Need to move these parameters into the parameter file
@@ -13,6 +12,7 @@ module FatesInsectMemMod
 	integer,  parameter :: numberInsectTypes = 1                  	! number of insect types (currently only one-mountain pine beetle)
 	integer,  parameter :: maxNumStages   = 20                    	! maximum number of stages for insect development
 	integer,  parameter :: maxpft = 14					! maximum number of plant pfts (I've manually entered the current number, which is inelegant...)
+	integer,  parameter :: insectType = 2  	! 1= MPB, 2=WPB 3=OtherType.
 
 			
 		
