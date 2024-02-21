@@ -163,7 +163,8 @@ integer :: NumPatches
 			A = currentSite%si_insect%indensity(1,7)
 			FA = currentSite%si_insect%indensity(1,8)
 			Bt = currentSite%si_insect%indensity(1,9)
-			ActiveParents = CurrentSite%si_insect%indensity(1,10)
+			Pare = CurrentSite%si_insect%indensity(1,10)
+			ActiveParents = CurrentSite%si_insect%indensity(1,11)
 			
 			ColdestT = currentSite%si_insect%ColdestT
 			In_PopN = currentSite%si_insect%In_PopN
@@ -285,7 +286,7 @@ integer :: NumPatches
 			currentSite%si_insect%indensity(1,8) = FA
 			currentSite%si_insect%indensity(1,9) = Bt
 			CurrentSite%si_insect%indensity(1,10) = Pare
-
+			CurrentSite%si_insect%indensity(1,11)=ActiveParents 
 			! densities of individuals transitioning from one stage to another
 			currentSite%si_insect%Transit(1) = NewEggstm1
 			currentSite%si_insect%Transit(2) = NewL1tm1
