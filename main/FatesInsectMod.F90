@@ -232,7 +232,7 @@ contains
 
 			!----------------------------------------------------------------------------------------------------
 			! Calling the full MPB simulation for the time step. 
-			call WPBSim(Tmax, Tmin, Parents, FA, OE, OL1, OL2, &
+			call WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
@@ -316,7 +316,7 @@ contains
 	end subroutine beetle_model
 ! Western Pine Beetle only functions 
 !==================================================================================================
-	subroutine WPBSim(Tmax, Tmin, Parents, FA, OE, OL1, OL2, &
+	subroutine WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
@@ -331,8 +331,8 @@ contains
 		implicit none
 
 		! Here are the input and output variables
-		real(r8), intent(in) :: Tmax
-		real(r8), intent(in) :: Tmin
+		real(r8), intent(in) :: max_airTC
+		real(r8), intent(in) :: min_airTC
 		real(r8), intent(inout) :: Parents
 		real(r8), intent(inout) :: FA
 
@@ -569,15 +569,15 @@ contains
 
 
 	! The mean between Tmin(4am) and Tmax(4pm)
-		CMean=(Tmax+Tmin)/2
+		CMean=(max_airTC+min_airTC)/2
 		! The mean between Tmax(4pm) and TminNext (4am the following day)
-		CMean2=(Tmax+Tmin)/2
+		CMean2=(max_airTC+min_airTC)/2
 		! The difference between Tmin and Tmax 
-		CDif=(Tmax-Tmin)
+		CDif=(max_airTC-min_airTC)
 		! The difference between Tmax and T min Next 
-		CDif2=(Tmax-Tmin)
+		CDif2=(max_airTC-min_airTC)
 		! This is the implementation of the Ssine Cycle for each of the time periods in the model. 
-		fouram=3.8532+(Tmin*.9677)
+		fouram=3.8532+(min_airTC*.9677)
 		sevenam=1.86978+(.93522*(CMean+(.5*CDif*-0.7071068)))
 		tenam=(-.4533)+(1.00899*(CMean))
 		onepm=(-1.148846)+(.985801*(CMean+(.5*CDif*0.7071068)))
@@ -763,7 +763,7 @@ contains
 		end if
 		! Simulating adult flight
 		! This updates the expected number of adults (A) and flying adults (FA).
-		call AdSR(NewA, Tmin2, Tmax,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
+		call AdSR(NewA, Tmin2, max_airTC,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
 
 	end subroutine WPBSim
 		
@@ -889,405 +889,6 @@ contains
 				end if
 			end if 
 		end subroutine WPBAttack		
-!=======================Functions only in MPB============================
-!========================================================================			
-	subroutine MPBSim2(Tmax, Tmin, Parents, FA, OE, OL1, OL2, &
-				OL3, OL4, OP, OT, NewEggstm1, NewL1tm1, &
-				NewL2tm1, NewL3tm1, NewL4tm1, NewPtm1, NewTtm1, &
-				Fec, E, L1, L2, L3, L4, P, Te, A, ColdestT, &
-				NtGEQ20, Bt, an, ab, FebInPopn, EndPopn, &
-			alpha3, Beta3,FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,&
-			FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
-		! This subroutine simulates the demographic processes
-		! of the mountain pine beetle for a single time step including
-		! oviposition, the egg stage, the four larval instars,
-		! the pupal stage, the teneral adult stage,
-		! the adult stage, the flying adult stage, and then attack.
-
-		implicit none
-
-		! Here are the input and output variables
-		real(r8), intent(in) :: Tmax
-		real(r8), intent(in) :: Tmin
-		real(r8), intent(inout) :: Parents
-		real(r8), intent(inout) :: FA
-
-		real(r8), intent(inout) :: OE(2**8)
-		real(r8), intent(inout) :: OL1(2**8)
-		real(r8), intent(inout) :: OL2(2**8)
-		real(r8), intent(inout) :: OL3(2**8)
-		real(r8), intent(inout) :: OL4(2**8)
-		real(r8), intent(inout) :: OP(2**8)
-		real(r8), intent(inout) :: OT(2**8)
-
-		real(r8), intent(inout) :: NewEggstm1
-		real(r8), intent(inout) :: NewL1tm1
-		real(r8), intent(inout) :: NewL2tm1
-		real(r8), intent(inout) :: NewL3tm1
-		real(r8), intent(inout) :: NewL4tm1
-		real(r8), intent(inout) :: NewPtm1
-		real(r8), intent(inout) :: NewTtm1
-
-		real(r8), intent(inout) :: Fec              ! the expected number of pre-eggs at each time
-		real(r8), intent(inout) :: E                ! the expected number of eggs at each time
-		real(r8), intent(inout) :: L1               ! the expected number of L1 at each time step
-		real(r8), intent(inout) :: L2               ! the expected number of L2 at each time step
-		real(r8), intent(inout) :: L3               ! the expected number of L3 at each time step
-		real(r8), intent(inout) :: L4               ! the expected number of L4 at each time step
-		real(r8), intent(inout) :: P                ! the expected number of pupae at each time step
-		real(r8), intent(inout) :: Te               ! the expected number of tenerals at each time step
-		real(r8), intent(inout) :: A                ! the expected number of flying adults at each time step
-
-		! The smallest probability of larval winter survival as a function of the lowest temperature to date.
-		real(r8), intent(in) :: ColdestT
-
-		! input and output variables
-		real(r8), intent(inout) :: NtGEQ20                ! initial susceptible host trees in the 20+ cm dbh size class
-		real(r8), intent(inout) :: Bt                     ! beetles that remain in flight from the previous step
-
-		! input parameters
-		real(r8), intent(in) :: an                        ! controls the tree loss rate
-		real(r8), intent(in) :: ab                        ! controls proportion of beetles that attack
-		real(r8), intent(in) :: FebInPopn                 ! February insect population
-		real(r8), intent(in) :: EndPopn 	      	      ! The endemic mountain pine beetle population (females per ha)
-		real(r8), intent(in) :: alpha3 	      	      ! the air temperature at which 50 % of beetle larvae die
-		real(r8), intent(in) :: Beta3                     ! parameter that controls how quicly beetle mortality changes with cold temps
-		real(r8), intent(in) :: FecMax 
-		real(r8), intent(in) :: Gen_mort 
-		real(r8), intent(in) :: Mort_Fec
-		real(r8), intent(in) :: Mort_ETP
-		real(r8), intent(in) :: Mort_Ads 
-		real(r8), intent(in) :: FFTL
-		real(r8), intent(in) :: FFTH 
-		real(r8), intent(in) :: FF1
-		real(r8), intent(in) :: FF2
-		real(r8), intent(in) :: FF3
-		real(r8), intent(in) :: FF4 
-		real(r8), intent(in) :: FF5
-		real(r8), intent(in) :: FF6
-		!---------------------------------------------------------------------------------
-		! All of the parameters below are internal parameters (internal to the subroutine)
-
-		! iterator
-		integer(kind = 4) :: j
-		! Defining the time step (1 day)
-
-		real(r8), parameter :: deltat = 1.0 ! units are days
-
-		!! Below I instantiate all of the rate constants. These
-		!! are given in (from Regniere et al 2012) and were updated
-		!! by personal communication with Jacques Regniere.
-
-		! parameters for oviposition rate
-		real(r8), parameter :: sigma0 = 0.2458         ! controls rate variability
-		real(r8), parameter :: TB0 = 4.6341            ! base temperature in degrees C
-		real(r8), parameter :: DeltaB0 = 0.1
-		real(r8), parameter :: TM0 = 27.7587           ! max temperature in degree C
-		real(r8), parameter :: DeltaM0 = 3.0759
-		real(r8), parameter :: omega0 = 0.3684
-		real(r8), parameter :: psi0 = 0.005199
-
-		! parameters for development rate for eggs
-		real(r8), parameter :: sigma1 = 0.1799         ! controls rate variability
-		real(r8), parameter :: TB1 = 7.0               ! base temperature in degrees C
-		real(r8), parameter :: DeltaB1 = 0.019297569
-		real(r8), parameter :: TM1 = 30.0928           ! max temperature in degree C
-		real(r8), parameter :: DeltaM1 = 4.4175
-		real(r8), parameter :: omega1 = 0.2563
-		real(r8), parameter :: psi1 = 0.02317
-
-		! parameters for development rate for L1 larvae
-		real(r8), parameter :: sigma2 = 0.2911      ! controls rate variability
-		real(r8), parameter :: TB2 = 3.5559
-		real(r8), parameter :: DeltaB2 = 0.1
-		real(r8), parameter :: TM2 = 29.2647
-		real(r8), parameter :: DeltaM2 = 3.8227
-		real(r8), parameter :: omega2 = 0.2398
-		real(r8), parameter :: psi2 = 0.01082
-
-		! parameters for development rate for L2 larvae
-		real(r8), parameter :: sigma3 = 0.3799       ! controls rate variability
-		real(r8), parameter :: TB3 = 6.9598
-		real(r8), parameter :: DeltaB3 = 0.097087379
-		real(r8), parameter :: TM3 = 28.9047
-		real(r8), parameter :: DeltaM3 = 3.0374
-		real(r8), parameter :: omega3 = 0.3714
-		real(r8), parameter :: psi3 = 0.01072
-
-		! parameters for development rate for L3 larvae
-		real(r8), parameter :: sigma4 = 0.3868      ! controls rate variability
-		real(r8), parameter :: TB4 = 6.8462
-		real(r8), parameter :: DeltaB4 = 0.1
-		real(r8), parameter :: TM4 = 28.7013
-		real(r8), parameter :: DeltaM4 = 2.5359
-		real(r8), parameter :: omega4 = 0.4399
-		real(r8), parameter :: psi4 = 0.003892
-
-		! parameters for development rate for L4 larvae
-		real(r8), parameter :: sigma5 = 0.3932       ! controls rate variability
-		real(r8), parameter :: TB5 = 16.2464
-		real(r8), parameter :: DeltaB5 = 0.039052889
-		real(r8), parameter :: TM5 = 28.0
-		real(r8), parameter :: DeltaM5 = 4.5504
-		real(r8), parameter :: omega5 = 0.2593
-		real(r8), parameter :: psi5 = 0.05034
-
-		! parameters for development rate for pupae
-		real(r8), parameter :: sigma6 = 0.2998       ! controls rate variability
-		real(r8), parameter :: TB6 = 5.63
-		real(r8), parameter :: DeltaB6 = 0.10989011
-		real(r8), parameter :: TM6 = 28.55
-		real(r8), parameter :: DeltaM6 = 2.86
-		real(r8), parameter :: omega6 = 0.1532
-		real(r8), parameter :: psi6 = 0.02054
-
-		! parameters for development rate for teneral adults
-		real(r8), parameter :: sigma7 = 0.5284       ! controls rate variability
-		real(r8), parameter :: TB7 = 4.24
-		real(r8), parameter :: DeltaB7 = 0.099967011
-		real(r8), parameter :: TM7 = 35.0
-		real(r8), parameter :: DeltaM7 = 7.1479
-		real(r8), parameter :: omega7 = 0.1463
-		real(r8), parameter :: psi7 = 0.01173
-
-		! Here are variables to hold the buffered under bark temperatures
-		real(r8) :: Tmean     ! mean temperature at each time step in degrees Celcius
-		real(r8) :: Tmin2     ! the buffered under-bark minimum temperature
-		real(r8) :: Tmax2     ! the warmer under bark maximum temperature
-
-		! Variables that relate to the domain of the lognormal distribution
-		integer(kind = 4), parameter :: n = 2**8    ! input variable. Must be specified
-		real(r8), parameter :: Mx = 2.0
-		real(r8), parameter :: Mn = 1.0e-20
-		real(r8), parameter :: da = (Mx - Mn)/(2.0**8.0)
-
-		real(r8) :: avec(n) = (/(Mn + j*da, j=0,n-1)/)          ! vector defining the domain
-
-		! parameters that change with each iteration
-		real(r8) :: med0              ! median development rate in the pre-egg stage
-		real(r8) :: med1              ! median development rate in egg stage
-		real(r8) :: med2              ! median development rate in L1 stage
-		real(r8) :: med3              ! median development rate in L2 stage
-		real(r8) :: med4              ! median development rate in L3 stage
-		real(r8) :: med5              ! median development rate in L4 stage
-		real(r8) :: med6              ! median development rate in Pupa stage
-		real(r8) :: med7              ! median development rate in teneral adult stage
-		real(r8) :: mu1               ! mean of the log transformed random development rate in egg stage
-		real(r8) :: mu2               ! mean of the log transformed random development rate in L1 stage
-		real(r8) :: mu3               ! mean of the log transformed random development rate in L2 stage
-		real(r8) :: mu4               ! mean of the log transformed random development rate in L3 stage
-		real(r8) :: mu5               ! mean of the log transformed random development rate in L4 stage
-		real(r8) :: mu6               ! mean of the log transformed random development rate in Pupa stage
-		real(r8) :: mu7               ! mean of the log transformed random development rate in teneral adult stage
-
-		! New individuals that developed into the next life stage in the
-		! time step (these are each scalar values)
-		real(r8) :: NewEggs
-		real(r8) :: NewL1
-		real(r8) :: NewL2
-		real(r8) :: NewL3
-		real(r8) :: NewL4
-		real(r8) :: NewP
-		real(r8) :: NewT
-		real(r8) :: NewA
-
-		!--------------------------------------------------------------------------------------------------
-
-		!! We need to compute the mean phloem temperature according to the model of
-		!! Bolstad, Bentz and Logan (1997).
-		!! We compute mean phloem temperature by averaging maximum and minimum phloem temperature.
-		!! Here I use the average temperature differential (6.6 degrees C)
-		Tmean = 0.5_r8*(Tmax + Tmin) + 0.9_r8 + 6.6_r8*(Tmax - Tmin)/(2.0_r8*24.4_r8)
-		Tmax2 = Tmax + 6.6_r8*(Tmax - Tmin)/24.4_r8
-		Tmin2 = Tmin + 1.8_r8
-
-		! Computing the median development rate for each life stage in this time step
-		call RegniereFunc(Tmean, TB0, DeltaB0, TM0, DeltaM0, omega0, psi0, med0)   ! for pre-eggs
-		call RegniereFunc(Tmean, TB1, DeltaB1, TM1, DeltaM1, omega1, psi1, med1)   ! for eggs
-		call RegniereFunc(Tmean, TB2, DeltaB2, TM2, DeltaM2, omega2, psi2, med2)   ! for L1
-		call RegniereFunc(Tmean, TB3, DeltaB3, TM3, DeltaM3, omega3, psi3, med3)   ! for L2
-		call RegniereFunc(Tmean, TB4, DeltaB4, TM4, DeltaM4, omega4, psi4, med4)   ! for L3
-		call RegniereFunc(Tmean, TB5, DeltaB5, TM5, DeltaM5, omega5, psi5, med5)   ! for L4
-		call RegniereFunc(Tmean, TB6, DeltaB6, TM6, DeltaM6, omega6, psi6, med6)   ! for pupae
-		call RegniereFunc(Tmean, TB7, DeltaB7, TM7, DeltaM7, omega7, psi7, med7)   ! for teneral adults
-
-		! The mu parameter of the lognormal distribution is given by the natural logarithm of the median
-		! development rate.
-		mu1 = 0.0_r8
-		mu2 = 0.0_r8
-		mu3 = 0.0_r8
-		mu4 = 0.0_r8
-		mu5 = 0.0_r8
-		mu6 = 0.0_r8
-		mu7 = 0.0_r8
-
-		if(med1 > 0.0_r8) then
-			mu1 = log(med1*deltat)  ! for eggs
-		end if 
-
-		if(med2 > 0.0_r8) then
-			mu2 = log(med2*deltat)  ! for L1
-		end if     
-
-		if(med3 > 0.0_r8) then
-			mu3 = log(med3*deltat)  ! for L2
-		end if 	
-
-		if(med4 > 0.0_r8) then	
-			mu4 = log(med4*deltat)  ! for L3
-		end if 	
-
-		if(med5 > 0.0_r8) then	
-			mu5 = log(med5*deltat)  ! for L4
-		end if 	
-
-		if(med6 > 0.0_r8) then
-			mu6 = log(med6*deltat)  ! for pupae
-		end if     
-
-		if(med7 > 0.0_r8) then
-			mu7 = log(med7*deltat)  ! for teneral adults
-		end if 
-
-		!---------------------------------------------------------------------------------------------------------
-		! Now we can simulate each of the life stages by calling the appropriate subroutines
-
-		! Killing beetles that mistakenly remain in flight during cold temperatures.
-		! This prevents them from killing trees when they shouldn't be.
-		if(Tmin < -18.0_r8)then
-			FA = 0.0_r8
-			Bt = 0.0_r8
-		end if
-
-		! Simulating the attack of host trees. I moved this to the front so that we 
-		! can initialize with an estimate of the number of flying adults.
-		call MPBAttack(NtGEQ20, Bt, FA, Parents, an, ab, FebInPopn, EndPopn)
-		! This updates the density of trees in each of the size classes, and the density of beetles that remain in
-		! flight and outputs a number of parents that will start the oviposition process.
-
-		! Simulating oviposition:
-		call Ovipos(Fec, Parents, med0, Tmin2,Ofma,Gen_mort,Mort_Fec NewEggs)
-		! The output of this subroutine (NewEggs) is input for the next subroutine below.
-		! The Ovipos subroutine also updates the scalar value for fecundity.
-		! It takes as input the number of parents which comes from an initial value
-		! or from the MPBAttack subroutine called at the end of this sequence.
-
-		! Simulating egg development:
-		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,Mort_ETP, NewEggs, NewEggstm1, OE, E, NewL1)
-		! The output of this subroutine (NewL1) is input for the next subroutine below.
-		! This updates the aging distribution (OE) and NewEggstm1 and
-		! outputs a scalar for the expected number of eggs.
-
-		! Simulating development of L1 larvae:
-		call LarvDev(n, avec, med2, mu2, sigma2, NewL1, NewL1tm1, OL1, L1, NewL2)
-		! The output of this subroutine (NewL2) is input for the next subroutine below.
-		! This updates the aging distribution (OL1) and  NewL1tm1 and
-		! outputs a scalar for the expected number of first instar larvae (L1).
-
-		! Simulating development of L2 larvae:
-		call LarvDev(n, avec, med3, mu3, sigma3, NewL2, NewL2tm1, OL2, L2, NewL3)
-		! The output of this subroutine (NewL3) is input for the next subroutine below.
-		! This updates the aging distribution (OL2) and  NewL2tm1 and
-		! outputs a scalar for the expected number of second instar larvae (L2).
-
-		! Simulating development of L3 larvae:
-		call LarvDev(n, avec, med4, mu4, sigma4, NewL3, NewL3tm1, OL3, L3, NewL4)
-		! The output of this subroutine (NewL4) is input for the next subroutine below.
-		! This updates the aging distribution (OL3) and  NewL3tm1 and
-		! outputs a scalar for the expected number of third instar larvae (L3).
-
-		! Simulating development of L4 larvae:
-		call LarvDev(n, avec, med5, mu5, sigma5, NewL4, NewL4tm1, OL4, L4, NewP)
-		! The output of this subroutine (NewP) is input for the next subroutine below.
-		! This updates the aging distribution (OL4) and  NewL4tm1 and
-		! outputs a scalar for the expected number of fourth instar larvae (L4).
-
-		! Applying larval mortality only as individuals exit the larval stage and
-		! develop into pupae because winter mortality depends on the coldest 
-		! temperature experienced over an individual's whole larval career. 
-		! Winter survival probability is modeled as a logistic curve function of 
-		! the coldest winter (air) temperature to date.
-		NewP = NewP/(1.0_r8 + exp(-(ColdestT - alpha3)/Beta3))
-
-		! Simulating pupal development:
-		call EPTDev(n, avec, med6, mu6, sigma6, Tmin2,Mort_ETP, NewP, NewPtm1, OP, P, NewT)
-		! The output of this subroutine (NewT) is input for the next subroutine below.
-		! This updates the aging distribution (OP) and  NewPtm1 and
-		! outputs a scalar for the expected number of pupae (P).
-
-		! Simulating teneral adult development:
-		call EPTDev(n, avec, med7, mu7, sigma7, Tmin2,Mort_ETP, NewT, NewTtm1, OT, Te, NewA)
-		! The output of this subroutine (NewA) is input for the next subroutine below.
-		! This updates the aging distribution (OT) and  NewTtm1 and
-		! outputs a scalar for the expected number of teneral adults (Te).
-
-		! Simulating adult flight
-		call AdSR(NewA, Tmin2, Tmax2,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A, FA)
-		! This updates the expected number of adults (A) and flying adults (FA).
-		End Subroutine MPBSim2
-!=================================================================================================================
-	subroutine MPBAttack(NtGEQ20, Bt, FA, Parents, an, ab, FebInPopn, EndPopn)
-    ! In this subroutine I solve the differential equations analytically.
-    implicit none
-    ! input and output variables.
-    ! Tree density in size classes per ha
-    real(r8), intent(inout) :: NtGEQ20              ! initial susceptible host trees in the 20+ cm dbh size class
-    real(r8), intent(inout) :: Bt                   ! beetles that remain in flight from the previous step
-    ! input variable
-    real(r8), intent(in) :: FA                      ! Adults that just started to fly in this time step
-    ! output variables
-    real(r8), intent(out) :: Parents                ! the density of beetles that entered trees killed in this time step
-    ! input parameters (dbh stands for tree diameter at breast height)
-    real(r8), intent(in) :: an                      ! controls the tree loss rate
-    real(r8), intent(in) :: ab                      ! controls proportion of beetles become parents
-    real(r8), intent(in) :: FebInPopn               ! February insect population
-    real(r8), intent(in) :: EndPopn              ! endemic mountain pine beetle population threshold
-
-    ! Here are internal variables and parameters
-    real(r8) :: timestep = 1.0_r8         	    ! one day time step
-    real(r8) :: Btp1                      	    ! an updated value for the beetles
-    real(r8) :: Ntp1GEQ20                 	    ! updated susceptible host trees in the 20+ cm dbh size class
-    real(r8) :: Ptp1GEQ20                 	    ! updated parent beetles the 20+ cm dbh size class
-
-    ! I add in the beetles that just started flying in the time step.
-    Bt = Bt + FA
-
-    !---------------------------------------------------------------------------------------------
-    ! Here I compute the analytic solutions
-
-    ! To prevent divide by zeros in the analytic solution, I take this precaution.
-    if(exp(ab)*NtGEQ20 == exp(an)*Bt) Bt = Bt - Bt*0.01_r8
-
-    ! Here's the solution for beetles
-    !Btp1 = Bt*exp((exp(an)*Bt - exp(ab)*NtGEQ20)*timestep)/&
-    !    (1.0_r8 + exp(an)*Bt/(exp(ab)*NtGEQ20 - exp(an)*Bt)*(1.0_r8 - exp((exp(an)*Bt - exp(ab)*NtGEQ20)*timestep)))
-
-    ! Here's the analytic solution for trees
-    Ntp1GEQ20 = NtGEQ20/&
-        (1.0_r8 + exp(an)*Bt/(exp(ab)*NtGEQ20 - exp(an)*Bt)*(1.0_r8 - exp((exp(an)*Bt - exp(ab)*NtGEQ20)*timestep)))
-	
-    ! Here's a more stable solution for beetles maybe (doesn't involve so many exponential functions).
-    Btp1 = exp(ab)/exp(an)*Ntp1GEQ20 + Bt - exp(ab)/exp(an)*NtGEQ20
-	
-    ! Here's the analytic solution for parent beetles
-    Ptp1GEQ20 = Bt - Btp1
-    !------------------------------------------------------------------------------------------------
-    ! Now I update all of the state variables. This depends on whether the population is endemic or not.
-    ! when populations are in the endemic phase, they only attack weakened
-    ! trees that are already functionally dead from other causes.
-
-    if(FebInPopn > EndPopn)then
-        Parents = Ptp1GEQ20
-        Bt = Btp1
-        NtGEQ20 = Ntp1GEQ20
-        else
-        ! Under the endemic scenario beetles do not kill trees.
-            Parents = Ptp1GEQ20
-            Bt = Btp1
-            NtGEQ20 = NtGEQ20
-    end if
-
-end subroutine MPBAttack
 !======================================================================================================
 subroutine Ovipos(Fec, Parents, med, Tmn2,FecMax,Gen_mort,Mort_Fec,NewEggs)
 
