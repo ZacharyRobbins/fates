@@ -83,43 +83,23 @@ module FatesInsectMemMod
         class(ed_site_insect_type), intent(inout) :: this
 	
 	! initialize the preference, but will move to the parameter file later
-	select case (insectType)
-		case(1) !MPB
-			allocate(this%InsectPFTPref(1:numberInsectTypes, 1:maxpft))
-			this%InsectPFTPref = 0 
-				this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
 
-			allocate(this%PhysAge(1:DomainSize,1:7))
-			this%PhysAge(1:DomainSize, 1:7) = 0.0_r8
+		 ! WPB
+	allocate(this%InsectPFTPref(1:numberInsectTypes, 1:maxpft))
+	this%InsectPFTPref = 0 
+	this%InsectPFTPref(1,2)= 1					! Resolve this for WPB!!!!!!!!!!!!!!!!!!!!!!!!
 			
-			allocate(this%Transit(1:7))
-			this%Transit(1:7) = 0.0_r8
+	allocate(this%PhysAge(1:DomainSize,1:6))
+	this%PhysAge(1:DomainSize, 1:) = 0.0_r8
 			
-			allocate(this%indensity(1:numberInsectTypes, 1:maxNumStages))	
-			this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
+	allocate(this%Transit(1:6))
+	this%Transit(1:5) = 0.0_r8
+			
+	allocate(this%indensity(1:numberInsectTypes, 1:maxNumStages))	
+	this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
 
-			this%ColdestT = 15.0_r8
-			
-			this%FebInPopn = 0.0_r8	
-		case(2) ! WPB
-			allocate(this%InsectPFTPref(1:numberInsectTypes, 1:maxpft))
-			this%InsectPFTPref = 0 
-				this%InsectPFTPref(1,2)= 1					! Resolve this for WPB!!!!!!!!!!!!!!!!!!!!!!!!
-			
-			allocate(this%PhysAge(1:DomainSize,1:6))
-			this%PhysAge(1:DomainSize, 1:) = 0.0_r8
-			
-			allocate(this%Transit(1:6))
-			this%Transit(1:5) = 0.0_r8
-			
-			allocate(this%indensity(1:numberInsectTypes, 1:maxNumStages))	
-			this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
-
-			this%ColdestT = 15.0_r8
-		case default
-			fates_endrun("Missing InsectType Parameter")
-	
-	end select		
+	this%ColdestT = 15.0_r8
+		
 	! As model runs typically start January 1, 
 	! I have decided to initialize with non-reactive temperatures for insects.
 	this%MaxDailyT = 0.0_r8
@@ -131,32 +111,20 @@ module FatesInsectMemMod
         implicit none
         ! argument
         class(ed_site_insect_type), intent(inout) :: this
-	select case (insectType)
-		case(1) !MPB
-			! initialize the preference, but will move to the parameter file later
-			this%InsectPFTPref = 0 
-			this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
-			this%PhysAge(1:DomainSize, 1:7) = 0.0_r8
-			this%Transit(1:7) = 0.0_r8
-			this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
-			this%ColdestT = 0.0_r8
-			this%FebInPopn = 0.0_r8
-		case(2) ! WPB
-		! initialize the preference, but will move to the parameter file later
-			this%InsectPFTPref = 0 
-			this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
-			this%PhysAge(1:DomainSize, 1:5) = 0.0_r8
-			this%Transit(1:5) = 0.0_r8
-			this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
-			this%ColdestT = 0.0_r8
-			this%FebInPopn = 0.0_r8
-			! As model runs typically start January 1, 
-			! I have decided to initialize with non-reactive temperatures for insects.
-			this%MaxDailyT = 0.0_r8
-			this%MinDailyT = 0.0_r8
-		case default
-			fates_endrun("Missing InsectType Parameter")
-	end select 
+
+	! initialize the preference, but will move to the parameter file later
+	this%InsectPFTPref = 0 
+	this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
+	this%PhysAge(1:DomainSize, 1:5) = 0.0_r8
+	this%Transit(1:5) = 0.0_r8
+	this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
+	this%ColdestT = 0.0_r8
+	this%FebInPopn = 0.0_r8
+	! As model runs typically start January 1, 
+	! I have decided to initialize with non-reactive temperatures for insects.
+	this%MaxDailyT = 0.0_r8
+	this%MinDailyT = 0.0_r8
+	
 
     end subroutine ZeroInsectSite
        
