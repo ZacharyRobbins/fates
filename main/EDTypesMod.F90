@@ -61,7 +61,7 @@ module EDTypesMod
   ! TODO: we use this cp_maxSWb only because we have a static array q(size=2) of
   ! land-ice abledo for vis and nir.  This should be a parameter, which would
   ! get us on track to start using multi-spectral or hyper-spectral (RGK 02-2017)
-
+ed_site_type
   integer, parameter, public :: maxSWb = 2      ! maximum number of broad-bands in the
                                                 ! shortwave spectrum cp_numSWb <= cp_maxSWb
                                                 ! this is just for scratch-array purposes
@@ -149,6 +149,7 @@ module EDTypesMod
   integer,  parameter, public :: dl_sf                = 5          ! array index of dead leaf pool for spitfire (dead grass and dead leaves)
   integer,  parameter, public :: lg_sf                = 6          ! array index of live grass pool for spitfire
 
+ 
   ! PATCH FUSION 
   real(r8), parameter, public :: force_patchfuse_min_biomass = 0.005_r8   ! min biomass (kg / m2 patch area) below which to force-fuse patches
   integer , parameter, public :: N_DBH_BINS           = 6                 ! no. of dbh bins used when comparing patches
@@ -867,7 +868,7 @@ module EDTypesMod
                                                          ! from cambial damage per year.  on size x pft array
      real(r8), allocatable :: fmort_rate_crown(:,:)      ! rate of individuals killed due to fire mortality 
                                                          ! from crown damage per year.  on size x pft array
-
+     real(r8), allocatable :: si_insect(:,:,:) ! insects per site. 
      real(r8), allocatable :: imort_rate_damage(:,:,:)     ! number of individuals per damage class that die from impact mortality
      real(r8), allocatable :: term_nindivs_canopy_damage(:,:,:) ! number of individuals per damage class that die from termination mortality - canopy
      real(r8), allocatable :: term_nindivs_ustory_damage(:,:,:) ! number of individuals per damage class that die from termination mortality - canopy
