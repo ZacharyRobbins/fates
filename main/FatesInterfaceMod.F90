@@ -459,8 +459,8 @@ contains
          allocate(bc_in%plant_p_uptake_flux(1,1))
       end if
 	  if (hlm_use_insect.eq.1)then
-		 allocate(bc_in%tgcm_max_pa(maxPatchesPerSite))
-		 allocate(bc_in%tgcm_min_pa(maxPatchesPerSite))
+		 allocate(bc_in%tgcm_max_pa(fates_maxPatchesPerSite))
+		 allocate(bc_in%tgcm_min_pa(fates_maxPatchesPerSite))
          bc_in%tgcm_max_pa(:) = -999.0_r8
          bc_in%tgcm_min_pa(:) = 999.0_r8
 	  end if 
