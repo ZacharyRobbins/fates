@@ -381,7 +381,9 @@ module FatesInterfaceTypesMod
 
       ! Patch 24-hour running mean of wind (m/s ?)
       real(r8), allocatable :: wind24_pa(:)
-
+      !insect model uses min and max now 
+      real(r8), allocatable : tgcm_min_pa(:)
+      real(r8), allocatable : tgcm_max_pa(:)
       ! Radiation variables for calculating sun/shade fractions
       ! ---------------------------------------------------------------------------------
 
