@@ -10,7 +10,6 @@ module FatesInsectMod
   public  :: insect_model
   ! !PRIVATE MEMBER FUNCTIONS:
   private :: beetle_model	! calls the Overall beetle model. 
-  private :: MPBSim2		! mountain pine beetle subroutine calls all of the affiliated MPB subroutines below
   private :: WPBSim         ! Western pine beetle development module
   private :: Ovipos			! Shared oviposition subroutine
   private :: EPTDev			! Shared  development subroutine for eggs, pupae, and teneral adults
@@ -81,276 +80,7 @@ contains
 
     !! Below are state variables that we track at the site level.
 	select case(insectType)
-    		case(1) !!!!!!!!!MPB Model
-			use FatesInsectMemMod    , only : an, ab, alpha3, Beta3,EndPopn,&
-			Ofmax,ONetp,Otm2,ETPT,ADSRT,FFTL,FFTH,&
-			FF1,FF2,FF3,FF4,FF5,FF6
-			! Containers for the distributions of physiological age for each life stage. In the
-			! InitInsectSite subroutine these will be allocated with size equal to the domain size.
-			real(r8) :: OE(2**8)           	! vector to hold physiological age distribution for eggs
-			real(r8) :: OL1(2**8)          	! vector to hold physiological age distribution for first instar larvae
-			real(r8) :: OL2(2**8)          	! vector to hold physiological age distribution for second instar larvae
-			real(r8) :: OL3(2**8)          	! vector to hold physiological age distribution for third instar larvae
-			real(r8) :: OL4(2**8)          	! vector to hold physiological age distribution for fourth instar larvae
-			real(r8) :: OP(2**8)           	! vector to hold physiological age distribution for pupae
-			real(r8) :: OT(2**8)           	! vector to hold physiological age distribution for teneral adults
-
-			real(r8) :: NewEggstm1                  	! density of new eggs oviposited in the previous time step (t minus 1)
-			real(r8) :: NewL1tm1                    	! density of new L1 in the previous time step (t minus 1)
-			real(r8) :: NewL2tm1                    	! density of new L2 in the previous time step (t minus 1)
-			real(r8) :: NewL3tm1                    	! density of new L3 in the previous time step (t minus 1)
-			real(r8) :: NewL4tm1                    	! density of new L4 in the previous time step (t minus 1)
-			real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
-			real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
-
-			real(r8) :: Fec                         	! the expected number of pre-eggs at each time per ha
-			real(r8) :: E                           	! the expected number of eggs at each time per ha
-			real(r8) :: L1                          	! the expected number of L1 at each time step per ha
-			real(r8) :: L2                          	! the expected number of L2 at each time step per ha
-			real(r8) :: L3                          	! the expected number of L3 at each time step per ha
-			real(r8) :: L4                          	! the expected number of L4 at each time step per ha
-			real(r8) :: P                          	! the expected number of pupae at each time step per ha
-			real(r8) :: Te                          	! the expected number of tenerals at each time step per ha
-			real(r8) :: A                           	! the expected number of flying adults at each time step ha
-			real(r8) :: FA                          	! density of adults that initiated flight in the current time step per ha
-			real(r8) :: Bt                		! beetles that remain in flight from the previous step per ha
-			real(r8) :: Pare                     	! density of parent beetles in the current time step per ha
-
-			! related to the winter mortality model for mountain pine beetle:
-			real(r8) :: ColdestT                       	! Coldest yearly temperature experienced to date.
-
-			! Current host tree densities for insects (in this case for mountain pine beetle) per ha
-			! Averaged over all patches within each site.
-			real(r8) :: NtGEQ20				! initial susceptible host trees in the 20+ cm dbh size class
-
-			! I also make the equivalent container for the density of hosts prior to insect attack so that we can compute
-			! the proportion that died in the current step (daily time step).
-			real(r8) :: Ntm1GEQ20            		! previous susceptible host trees in the 20+ cm dbh size class
-
-			! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
-			real(r8) :: FebInPopn         		! current total population of insects estimated on Feb. first (before they would fly)
-			!real(r8), parameter :: EndMPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
-			
-			! number of patches in the site
-			integer :: NumPatches
-
-			!----------------------------------------------------------------------------------------------------
-			! Grabbing the values of the state variables from currentSite
-
-			! The physiological age distributions
-			OE = currentSite%si_insect%PhysAge(:,1)
-			OL1 = currentSite%si_insect%PhysAge(:,2)
-			OL2 = currentSite%si_insect%PhysAge(:,3)
-			OL3 = currentSite%si_insect%PhysAge(:,4)
-			OL4 = currentSite%si_insect%PhysAge(:,5)
-			OP = currentSite%si_insect%PhysAge(:,6)
-			OT = currentSite%si_insect%PhysAge(:,7)
-
-			! The transitioning individuals from one life stage to another.
-			NewEggstm1 = currentSite%si_insect%Transit(1)
-			NewL1tm1 = currentSite%si_insect%Transit(2)
-			NewL2tm1 = currentSite%si_insect%Transit(3)
-			NewL3tm1 = currentSite%si_insect%Transit(4)
-			NewL4tm1 = currentSite%si_insect%Transit(5)
-			NewPtm1 = currentSite%si_insect%Transit(6)
-			NewTtm1 = currentSite%si_insect%Transit(7)
-
-			! The one in the row argumuent of the indensity array corresponds to mountain pine beetle
-			! (insect type 1). The number in the column argument of the array refers to the
-			! life stage: 1->Fec, 2->Eggs, 3->L1, 4->L2, 5->L4, 6->L4, 7->Pupae,
-			! 8->Teneral adults, 9->Adults, 10->Flown Adults, 11->flying beetles from prvious step (Bt),
-			! 12->Parents (flown adults that succesfully attacked trees that day--daily time step)
-			! Columns 13 to 20 of the indensity array are empty for the mountain pine beetle.
-			Fec = currentSite%si_insect%indensity(1,1)
-			E = currentSite%si_insect%indensity(1,2)
-			L1 = currentSite%si_insect%indensity(1,3)
-			L2 = currentSite%si_insect%indensity(1,4)
-			L3 = currentSite%si_insect%indensity(1,5)
-			L4 = currentSite%si_insect%indensity(1,6)
-			P = currentSite%si_insect%indensity(1,7)
-			Te = currentSite%si_insect%indensity(1,8)
-			A = currentSite%si_insect%indensity(1,9)
-			FA = currentSite%si_insect%indensity(1,10)
-			Bt = currentSite%si_insect%indensity(1,11)
-			Parents = CurrentSite%si_insect%indensity(1,12)
-
-			ColdestT = currentSite%si_insect%ColdestT
-			FebInPopn = currentSite%si_insect%FebInPopn
-
-			!----------------------------------------------------------------------------------------------------
-			! Calculate the site level average tree density in each of the size classes that we use in the 
-			! mountain pine beetle model across all patches. I then call the insect life cycle model at the site level.
-			NtGEQ20 = 0.0_r8
-
-			NumPatches = 0
-			
-			max_airTC = 0.0_r8
-			min_airTC = 0.0_r8
-			
-			! We cycle through the patches from oldest to youngest  
-			currentPatch => currentSite%oldest_patch	! starting with the oldest 
-			
-			do while (associated(currentPatch))
-
-			iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
-				currentCohort => currentPatch%tallest
-			
-			! Computing patch numbers
-			NumPatches = NumPatches + 1
-			
-			! Computing mean temperature averaged across all patches (normalized later)
-			max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
-			min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
-
-			do while(associated(currentCohort)) ! cycling through cohorts from tallest to shortest
-
-					! Below I compute the tree density per ha in each of the size classes
-					! used in the current version of the insect mortality model.
-
-					! Here is the 20+ cm dbh size class we use in the model. The fraction 
-				! in parentheses ensures that when summed up over the whole site,
-				! the density of trees will be the density per ha.
-					if(currentCohort%pft == 2 .and. currentCohort%dbh >= 20.0_r8)then
-						NtGEQ20 = NtGEQ20 + currentCohort%n*(currentPatch%area/10000.0_r8)
-					end if
-
-					currentCohort => currentCohort%shorter
-
-				end do ! This ends the cohort do loop
-			
-			currentPatch => currentPatch%younger
-			
-			end do	! Patch do loop
-			
-			! Now completing the temperature averaging process.
-			max_airTC = max_airTC/NumPatches
-			min_airTC = min_airTC/NumPatches
-
-			! I record the number of trees in each of the size classes prior to attack.
-			Ntm1GEQ20 = NtGEQ20
-			
-			! Updating the coldest temperature
-			if(min_airTC < ColdestT)then
-				ColdestT = Tmin
-			end if
-			
-			! Resetting the coldest temperature tracker on July 21 of each year:
-			if(hlm_current_month == 7 .and. hlm_current_day == 21) then
-			   ColdestT = 15.0_r8
-			end if
-			
-			! In the case of beetle extinction, we re-initialize the parent beetle population with
-			! a small number (endemic beetle population level) of parent beetles. We count the
-			! population in February so that we know that none have flown yet, but if it is exceedingly
-			! small, we re-initialize with parents on July 21 of the same year.
-			if(hlm_current_month == 2 .and. hlm_current_day == 1) then
-				! We need to apply winter martality to the larvae even though it might not have been applied yet
-			! in the model (it is only applied after larvae develop into pupae to account for all temperatures
-			! experienced by developing larvae).
-				FebInPopn = Fec + E + (L1 + L2 + L3 + L4)/(1.0_r8 + exp(-(ColdestT - alpha3)/Beta3)) + P + Te + A
-			!FebInPopn = Fec + E + L1 + L2 + L3 + L4 + P + Te + A
-			end if
-			
-			if(hlm_current_year == 2003 .and. hlm_current_month == 7 .and. hlm_current_day == 21) then
-				! The model is initialized with the number of beetles that is consistent with the size of the outbreak in 2003
-			! according to our attack model.
-				FA = 77.27635_r8
-				FebInPopn = 77.27635_r8
-			end if
-
-			if(hlm_current_month == 7 .and. hlm_current_day == 21 .and. FebInPopn < EndPopn) then
-				! The endemic mountain pine beetle population per hectare was estimated by Carroll et al
-				! to be 40 attacks (female beetles) per ha.
-				Parents = EndPopn
-			end if
-
-			!----------------------------------------------------------------------------------------------------
-			! Calling the full MPB simulation for the time step. 
-			call MPBSim2(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
-					OL3, OL4, OP, OT, NewEggstm1, NewL1tm1, &
-					NewL2tm1, NewL3tm1, NewL4tm1, NewPtm1, NewTtm1, &
-					Fec, E, L1, L2, L3, L4, P, Te, A, ColdestT, &
-					NtGEQ20, Bt, an, ab, FebInPopn, EndPopn, &
-				alpha3, Beta3,Ofmax,ONetp,Otm2,ETPT,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5)
-
-			!----------------------------------------------------------------------------------------------------
-			! update the vegetation mortality.
-			
-			! We cycle through the patches from oldest to youngest  
-			currentPatch => currentSite%oldest_patch	! starting with the oldest 
-			
-			do while (associated(currentPatch))
-				currentCohort => currentPatch%tallest
-
-				! Note that insect mortality is greater than zero only if the beetle population is
-				! larger than the epidemic beetle population. Otherwise beetles only colonize trees
-				! that were already killed by other mortality causes so insect mortality is effectively zero.
-				do while(associated(currentCohort)) ! cycling through cohorts from tallest to shortest
-					! Below I compute the tree mortality rate (n/ha/year) in each of the size classes
-					! used in the current version of the insect mortality model.
-			
-					! Here is the 20+ cm dbh size class we use in the model.
-				! In each dbhclass we multiply the daily probability of mortality by 365.0_r8
-				! to the mortality rate on a yearly basis.
-					if(FebInPopn > EndPopn .and. currentCohort%pft == 2 .and. currentCohort%dbh >= &
-					20.0_r8 .and. NtGEQ20 > 0.0_r8 .and. Ntm1GEQ20 > NtGEQ20)then
-				
-						currentCohort%inmort = (1.0_r8 - NtGEQ20/Ntm1GEQ20)*365.0_r8	
-					else
-						currentCohort%inmort = 0.0_r8
-					end if
-
-					currentCohort => currentCohort%shorter
-
-				end do ! This ends the cohort do loop
-			
-			currentPatch => currentPatch%younger
-			
-			end do ! This ends the patch do loop
-
-			!----------------------------------------------------------------------------------------------------
-			!assign the updated values to the array for storage
-
-			 ! Mountain pine beetle densities in each life stage
-			 currentSite%si_insect%indensity(1,1) = Fec
-			 currentSite%si_insect%indensity(1,2) = E
-			 currentSite%si_insect%indensity(1,3) = L1
-			 currentSite%si_insect%indensity(1,4) = L2
-			 currentSite%si_insect%indensity(1,5) = L3
-			 currentSite%si_insect%indensity(1,6) = L4
-			 currentSite%si_insect%indensity(1,7) = P
-			 currentSite%si_insect%indensity(1,8) = Te
-			 currentSite%si_insect%indensity(1,9) = A
-			 currentSite%si_insect%indensity(1,10) = FA
-			 currentSite%si_insect%indensity(1,11) = Bt
-			 CurrentSite%si_insect%indensity(1,12) = Parents
-
-			 ! densities of individuals transitioning from one stage to another
-			 currentSite%si_insect%Transit(1) = NewEggstm1
-			 currentSite%si_insect%Transit(2) = NewL1tm1
-			 currentSite%si_insect%Transit(3) = NewL2tm1
-			 currentSite%si_insect%Transit(4) = NewL3tm1
-			 currentSite%si_insect%Transit(5) = NewL4tm1
-			 currentSite%si_insect%Transit(6) = NewPtm1
-			 currentSite%si_insect%Transit(7) = NewTtm1
-
-			 ! The physiological age distributions
-			 currentSite%si_insect%PhysAge(:,1) = OE
-			 currentSite%si_insect%PhysAge(:,2) = OL1
-			 currentSite%si_insect%PhysAge(:,3) = OL2
-			 currentSite%si_insect%PhysAge(:,4) = OL3
-			 currentSite%si_insect%PhysAge(:,5) = OL4
-			 currentSite%si_insect%PhysAge(:,6) = OP
-			 currentSite%si_insect%PhysAge(:,7) = OT
-
-			! The winter survival related variables.
-			currentSite%si_insect%ColdestT = ColdestT
-			
-			currentSite%si_insect%FebInPopn = FebInPopn
-			
-			! Daily maximum and minimum temperatures for diagnostic purposes
-			currentSite%si_insect%MaxDailyT = max_airTC
-			currentSite%si_insect%MinDailyT = min_airTC
+    		
 !!!=====================================================================================
 !=====   Start WPB Processor===================
 !!!=====================================================================================
@@ -589,7 +319,7 @@ contains
 	subroutine WPBSim(Tmax, Tmin, Parents, FA, OE, OL1, OL2, &
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
-			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents ColdestT, &
+			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
 			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn,&
 			Ofmax,ONetp,Otm2,ETPT,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 		! This subroutine simulates the demographic processes
@@ -720,11 +450,11 @@ contains
 		 ! Here are variables to hold the buffered under bark temperatures
 		real(kind = 8) :: Tmeanall    
 		real(kind = 8) :: Cmean             ! mean of current day
-		real(kind = 8) :: Cmean2 			! Mean of next half
-		real(kind = 8) :: CDif            	! Distance between poles
+		real(kind = 8) :: Cmean2 	    ! Mean of next half
+		real(kind = 8) :: CDif              ! Distance between poles
 		real(kind = 8) :: CDif2             ! Distance between next pole
 		real(kind = 8) :: fouram            ! 4am Temp
-		real(kind = 8) :: sevenam 			! 7am Temp
+		real(kind = 8) :: sevenam 	   ! 7am Temp
 		real(kind = 8) :: tenam             ! 10am Temp
 		real(kind = 8) :: onepm             ! 1pm Temp
 		real(kind = 8) :: fourpm            ! 4pm Temp
