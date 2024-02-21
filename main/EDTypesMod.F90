@@ -62,7 +62,7 @@ module EDTypesMod
   ! TODO: we use this cp_maxSWb only because we have a static array q(size=2) of
   ! land-ice abledo for vis and nir.  This should be a parameter, which would
   ! get us on track to start using multi-spectral or hyper-spectral (RGK 02-2017)
-ed_site_type
+
   integer, parameter, public :: maxSWb = 2      ! maximum number of broad-bands in the
                                                 ! shortwave spectrum cp_numSWb <= cp_maxSWb
                                                 ! this is just for scratch-array purposes
