@@ -7,7 +7,7 @@ module FatesInsectMod
   !use EDParamsMod               , only : insect_an
   use FatesInsectMemMod, only : r1,x0,x1,CWDvec,x2
   use FatesInsectMemMod, only : SizeFactor,EndPopn,FecMax,Gen_mort
-  use FatesInsectMemMod, only : Mort_Fec,Mort_ETP,Mort_Ads,
+  use FatesInsectMemMod, only : Mort_Fec,Mort_ETP,Mort_Ads
   use FatesInsectMemMod, only : FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6
 			
   ! !PUBLIC MEMBER FUNCTIONS:
