@@ -98,31 +98,31 @@ contains
     real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
     real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
 
-			real(r8) :: Fec                         	! the expected number of pre-eggs at each time per ha
-			real(r8) :: E                           	! the expected number of eggs at each time per ha
-			real(r8) :: L1                          	! the expected number of L1 at each time step per ha
-			real(r8) :: L2                          	! the expected number of L2 at each time step per ha
-			real(r8) :: P                          	! the expected number of pupae at each time step per ha
-			real(r8) :: Te                          	! the expected number of tenerals at each time step per ha
-			real(r8) :: A                           	! the expected number of flying adults at each time step ha
-			real(r8) :: FA                          	! density of adults that initiated flight in the current time step per ha
-			real(r8) :: Bt                		! beetles that remain in flight from the previous step per ha
-			real(r8) :: Parents                     	! density of parent beetles in the current time step per ha
+    real(r8) :: Fec                         	! the expected number of pre-eggs at each time per ha
+    real(r8) :: E                           	! the expected number of eggs at each time per ha
+    real(r8) :: L1                          	! the expected number of L1 at each time step per ha
+    real(r8) :: L2                          	! the expected number of L2 at each time step per ha
+    real(r8) :: P                          	! the expected number of pupae at each time step per ha
+    real(r8) :: Te                          	! the expected number of tenerals at each time step per ha
+    real(r8) :: A                           	! the expected number of flying adults at each time step ha
+    real(r8) :: FA                          	! density of adults that initiated flight in the current time step per ha
+    real(r8) :: Bt                		! beetles that remain in flight from the previous step per ha
+    real(r8) :: Parents                     	! density of parent beetles in the current time step per ha
 			! related to the winter mortality model for mountain pine beetle:
-			real(r8) :: ColdestT                       	! Coldest yearly temperature experienced to date.
+    real(r8) :: ColdestT                       	! Coldest yearly temperature experienced to date.
 
-			! Current host tree densities for insects (in this case for mountain pine beetle) per ha
-			! Averaged over all patches within each site.
-			real(r8) :: NtGEQ317				! initial susceptible host trees in the 20+ cm dbh size class
-			real(r8) :: NtGEQ00
-			! I also make the equivalent container for the density of hosts prior to insect attack so that we can compute
-			! the proportion that died in the current step (daily time step).
-			real(r8) :: Ntm1GEQ317            		! previous susceptible host trees in the 20+ cm dbh size class
-			real(r8) :: Ntm1GEQ00
-			! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
-			real(r8) :: FebInPopn         		! current total population of insects estimated on Feb. first (before they would fly)
-			!real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
-			!Parameter above now intialized in InsectMemMod 		
+! Current host tree densities for insects (in this case for mountain pine beetle) per ha
+! Averaged over all patches within each site.
+real(r8) :: NtGEQ317				! initial susceptible host trees in the 20+ cm dbh size class
+real(r8) :: NtGEQ00
+! I also make the equivalent container for the density of hosts prior to insect attack so that we can compute
+! the proportion that died in the current step (daily time step).
+real(r8) :: Ntm1GEQ317            		! previous susceptible host trees in the 20+ cm dbh size class
+real(r8) :: Ntm1GEQ00
+! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
+real(r8) :: In_PopN         		! current total population of insects estimated on Feb. first (before they would fly)
+!real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
+!Parameter above now intialized in InsectMemMod 		
 !!!=====================================================================================
 !=====   Start WPB Processor===================
 !!!=====================================================================================
@@ -165,7 +165,7 @@ contains
 			ActiveParents = CurrentSite%si_insect%indensity(1,10)
 			
 			ColdestT = currentSite%si_insect%ColdestT
-			FebInPopn = currentSite%si_insect%FebInPopn
+			In_PopN = currentSite%si_insect%In_PopN
 			
 			NtGEQ317 = 0.0_r8
 			NtGEQ00 = 0.0_r8
@@ -177,7 +177,7 @@ contains
 			
 			do while (associated(currentPatch))
 
-			iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
+				iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
 				currentCohort => currentPatch%tallest
 			
 			! Computing patch numbers
@@ -225,10 +225,10 @@ contains
 				! We need to apply winter martality to the larvae even though it might not have been applied yet
 			! in the model (it is only applied after larvae develop into pupae to account for all temperatures
 			! experienced by developing larvae).
-				FebInPopn = Fec + E + (L1 + L2 + L3 + L4)/(1.0_r8 + exp(-(ColdestT - 28.391)/6.124))) + P + Te + A
-			!FebInPopn = Fec + E + L1 + L2 + L3 + L4 + P + Te + A
+				In_PopN = Fec + E + (L1 + L2 + L3 + L4)+ P + Te + A
+			
 			end if
-			if(hlm_current_month == 10 .and. hlm_current_day == 1 .and. FebInPopn < EndPopn) then
+			if(hlm_current_month == 10 .and. hlm_current_day == 1 .and. In_PopN < EndPopn) then
 				! The endemic western pine beetle population because the parents of a new cohort.  
 				Parents = EndPopn
 			end if
@@ -239,7 +239,7 @@ contains
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
-			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn,&
+			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,In_PopN, EndPopn,&
 			FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 			! update the vegetation mortality.
 			
@@ -258,10 +258,10 @@ contains
 					! In each dbhclass we multiply the daily probability of mortality by 365.0_r8
 					! to the mortality rate on a yearly basis. !!ZR-this seems weird
 					
-	1				if(FebInPopn > EndPopn .and. currentCohort%pft == 2 .and. and. currentCohort%dbh >= 31.6_r8 .and.&
+	1				if(In_PopN > EndPopn .and. currentCohort%pft == 2 .and. and. currentCohort%dbh >= 31.6_r8 .and.&
 					NtGEQ317 > 0.0_r8 .and. Ntm1GEQ317 > NtGEQ317)then
 						currentCohort%inmort = (1.0_r8 - NtGEQ317/Ntm1GEQ317)*365.0_r8				
-					elseif(FebInPopn > EndPopn .and. currentCohort%pft == 2 ..and. currentCohort%dbh <= 31.6_r8 .and. &
+					elseif(In_PopN > EndPopn .and. currentCohort%pft == 2 ..and. currentCohort%dbh <= 31.6_r8 .and. &
 					currentCohort%dbh <=10.0_r8 NtGEQ00 > 0.0_r8 .and. Ntm1GEQ00 > NtGEQ00)then
 						currentCohort%inmort = (1.0_r8 - NtGEQ00/Ntm1GEQ00)*365.0_r8	
 					else
@@ -305,7 +305,7 @@ contains
 			currentSite%si_insect%PhysAge(:,6) = OPare
 			! The winter survival related variables.
 			currentSite%si_insect%ColdestT = ColdestT
-			currentSite%si_insect%FebInPopn = FebInPopn
+			currentSite%si_insect%In_PopN = In_PopN
 
 			! Daily maximum and minimum temperatures for diagnostic purposes
 			currentSite%si_insect%MaxDailyT = max_airTC
@@ -321,7 +321,7 @@ contains
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
-			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn,&
+			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,In_PopN, EndPopn,&
 			FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 		! This subroutine simulates the demographic processes
 		! of the mountain pine beetle for a single time step including
@@ -371,7 +371,7 @@ contains
 		real(r8), intent(in) :: r1                     ! Effective population of attack 
 		real(r8), intent(in) :: x0                     ! Controls the intercept of the attack function
 		real(r8), intent(in) :: CWDvec                 ! Value of SPI-4yr used to measure drought
-		real(r8), intent(in) :: FebInPopn               ! February insect population
+		real(r8), intent(in) :: In_PopN               ! February insect population
 		real(r8), intent(in) :: EndPopn 	      	   ! The endemic Western pine beetle population (females per ha)
 		real(r8), intent(in) :: x1 	      	      	   ! The parameter of drought influence in attack function
 		real(r8), intent(in) :: x2                     ! The parameter of the relative influence of tree size class
@@ -701,7 +701,7 @@ contains
 		end if
 		! Simulating the attack of host trees. I moved this to the front so that we 
 		! can initialize with an estimate of the number of flying adults.
-		call WPBAttack(NtGEQ317, NtGEQ00, Bt, FA, Parents, r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn)
+		call WPBAttack(NtGEQ317, NtGEQ00, Bt, FA, Parents, r1,x0,x1,CWDvec,x2,SizeFactor,In_PopN, EndPopn)
 		! This updates the density of trees in each of the size classes, and the density of beetles that remain in
 		!!! New parents wait 8 days to oviposit.
 		call EPTDev(n, avec, medA, muA, sigmaA, Tmin2,Mort_ETP, Parents, NewParentstm1, OPare, Pare, ActiveParents)
@@ -770,7 +770,7 @@ contains
 		
 !===================================================================================================================		
 !==================================================================================================================	
-		subroutine WPBAttack(NtGEQ317, NtGEQ00,Bt, FA, Parents, r1,x0,x1,CWD,x2,SizeFactor,FebInPopn,EndPopn)	
+		subroutine WPBAttack(NtGEQ317, NtGEQ00,Bt, FA, Parents, r1,x0,x1,CWD,x2,SizeFactor,In_PopN,EndPopn)	
 		 ! In this subroutine we use the TDIA model to determine the number of trees that are killed using the relationship between the 
 		 ! the number of beetles in flight and the amount of drought experienced by the trees and their size. 
 			implicit none
@@ -793,7 +793,7 @@ contains
 			real(r8), intent(in) :: x2                      ! controls the tree loss rate
 			!real(r8), intent(in) :: x0                      ! controls proportion of beetles become parents
 			real(r8), intent(in) :: SizeFactor                     ! controls proportion of beetles become parents
-			real(r8), intent(in) :: FebInPopn               ! February insect population
+			real(r8), intent(in) :: In_PopN               ! February insect population
 			real(r8), intent(in) :: EndPopn              ! endemic western pine beetle population threshold
 			real(kind = 8) :: phi1                      ! controls beetle attack success
 			real(kind = 8) :: phi2                      ! controls beetle attack success     
@@ -876,7 +876,7 @@ contains
 				!Now I update all of the state variables. This depends on whether the population is endemic or not.
 				! when populations are in the endemic phase, they only attack weakened
 				! trees that are already functionally dead from other causes.
-				if(FebInPopn > EndPopn)then
+				if(In_PopN > EndPopn)then
 					Parents = Ptp1GEQ20
 					Bt = 0_r8
 					NtGEQ317 = Ntp1GEQ317
