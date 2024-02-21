@@ -85,8 +85,8 @@ contains
 !=====   Start WPB Processor===================
 !!!=====================================================================================
 		case(2)
-			use FatesInsectMemMod, only r1,x0,x1,CWDvec,x2,SizeFactor,EndPopn,Ofmax,ONetp,&
-			Otm2,ETPT,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6
+			use FatesInsectMemMod, only : r1,x0,x1,CWDvec,x2,SizeFactor,EndPopn,FecMax,Gen_mort,&
+			Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6
 			
 			! InitInsectSite subroutine these will be allocated with size equal to the domain size.
 			real(r8) :: OE(2**8)           	! vector to hold physiological age distribution for eggs
@@ -237,7 +237,7 @@ contains
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
 			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn,&
-			Ofmax,ONetp,Otm2,ETPT,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
+			FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 			! update the vegetation mortality.
 			
 			! We cycle through the patches from oldest to youngest  
@@ -321,7 +321,7 @@ contains
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
 			NtGEQ317, NtGEQ00, Bt,r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn,&
-			Ofmax,ONetp,Otm2,ETPT,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
+			FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 		! This subroutine simulates the demographic processes
 		! of the mountain pine beetle for a single time step including
 		! oviposition, the egg stage, the four larval instars,
@@ -376,11 +376,11 @@ contains
 		real(r8), intent(in) :: x2                     ! The parameter of the relative influence of tree size class
 		real(r8), intent(in) :: SizeFactor             ! parameter that controls the relative attraction to the large size class
 		real(r8), intent(in) :: Initparents			   ! Initializing population.
-		real(r8), intent(in) :: Ofmax 
-		real(r8), intent(in) :: ONetp 
-		real(r8), intent(in) :: Otm2
-		real(r8), intent(in) :: ETPT
-		real(r8), intent(in) :: ADSRT 
+		real(r8), intent(in) :: FecMax 
+		real(r8), intent(in) :: Gen_mort 
+		real(r8), intent(in) :: Mort_Fec
+		real(r8), intent(in) :: 
+		real(r8), intent(in) :: Mort_Ads 
 		real(r8), intent(in) :: FFTL
 		real(r8), intent(in) :: FFTH 
 		real(r8), intent(in) :: FF1
@@ -703,9 +703,9 @@ contains
 		call WPBAttack(NtGEQ317, NtGEQ00, Bt, FA, Parents, r1,x0,x1,CWDvec,x2,SizeFactor,FebInPopn, EndPopn)
 		! This updates the density of trees in each of the size classes, and the density of beetles that remain in
 		!!! New parents wait 8 days to oviposit.
-		call EPTDev(n, avec, medA, muA, sigmaA, Tmin2,ETPT, Parents, NewParentstm1, OPare, Pare, ActiveParents)
+		call EPTDev(n, avec, medA, muA, sigmaA, Tmin2,Mort_ETP, Parents, NewParentstm1, OPare, Pare, ActiveParents)
 		! Simulating oviposition:
-		call Ovipos(Fec, ActiveParents, med0, Tmin2,Ofmax,ONetp,Otm2, NewEggs)
+		call Ovipos(Fec, ActiveParents, med0, Tmin2,FecMax,Gen_mort,Mort_Fec, NewEggs)
 		! The output of this subroutine (NewEggs) is input for the next subroutine below.
 		! The Ovipos subroutine also updates the scalar value for fecundity.
 		! It takes as input the number of parents which comes from an initial value
@@ -717,7 +717,7 @@ contains
 			E=E*.5
 		end if
 		! Simulating egg development:
-		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,ETPT, NewEggs, NewEggstm1, OE, E, NewL1)
+		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,Mort_ETP, NewEggs, NewEggstm1, OE, E, NewL1)
 		! The output of this subroutine (NewL1) is input for the next subroutine below.
 		! This updates the aging distribution (OE) and NewEggstm1 and
 		! outputs a scalar for the expected number of eggs.
@@ -739,7 +739,7 @@ contains
 		! NewP = NewP*0.5
 
 		! Simulating pupal development:
-		call EPTDev(n, avec, med4, mu4, sigma4, Tmin2,ETPT, NewP, NewPtm1, OP, P, NewT)
+		call EPTDev(n, avec, med4, mu4, sigma4, Tmin2,Mort_ETP, NewP, NewPtm1, OP, P, NewT)
 		! The output of this subroutine (NewT) is input for the next subroutine below.
 		! This updates the aging distribution (OP) and  NewPtm1 and
 		! outputs a scalar for the expected number of pupae (P).
@@ -751,7 +751,7 @@ contains
 		end if
 		! Simulating teneral adult development:
 
-		call EPTDev(n, avec, med5, mu5, sigma5, Tmin2,ETPT, NewT, NewTtm1, OT, Te, NewA)
+		call EPTDev(n, avec, med5, mu5, sigma5, Tmin2,Mort_ETP, NewT, NewTtm1, OT, Te, NewA)
 		! The output of this subroutine (NewA) is input for the next subroutine below.
 		! This updates the aging distribution (OT) and  NewTtm1 and
 		! outputs a scalar for the expected number of teneral adults (Te).
@@ -763,7 +763,7 @@ contains
 		end if
 		! Simulating adult flight
 		! This updates the expected number of adults (A) and flying adults (FA).
-		call AdSR(NewA, Tmin2, Tmax,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
+		call AdSR(NewA, Tmin2, Tmax,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
 
 	end subroutine WPBSim
 		
@@ -896,7 +896,7 @@ contains
 				NewL2tm1, NewL3tm1, NewL4tm1, NewPtm1, NewTtm1, &
 				Fec, E, L1, L2, L3, L4, P, Te, A, ColdestT, &
 				NtGEQ20, Bt, an, ab, FebInPopn, EndPopn, &
-			alpha3, Beta3,Ofmax,ONetp,Otm2,ETPT,ADSRT,&
+			alpha3, Beta3,FecMax,Gen_mort,Mort_Fec,Mort_ETP,Mort_Ads,&
 			FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6)
 		! This subroutine simulates the demographic processes
 		! of the mountain pine beetle for a single time step including
@@ -952,11 +952,11 @@ contains
 		real(r8), intent(in) :: EndPopn 	      	      ! The endemic mountain pine beetle population (females per ha)
 		real(r8), intent(in) :: alpha3 	      	      ! the air temperature at which 50 % of beetle larvae die
 		real(r8), intent(in) :: Beta3                     ! parameter that controls how quicly beetle mortality changes with cold temps
-		real(r8), intent(in) :: Ofmax 
-		real(r8), intent(in) :: ONetp 
-		real(r8), intent(in) :: Otm2
-		real(r8), intent(in) :: ETPT
-		real(r8), intent(in) :: ADSRT 
+		real(r8), intent(in) :: FecMax 
+		real(r8), intent(in) :: Gen_mort 
+		real(r8), intent(in) :: Mort_Fec
+		real(r8), intent(in) :: Mort_ETP
+		real(r8), intent(in) :: Mort_Ads 
 		real(r8), intent(in) :: FFTL
 		real(r8), intent(in) :: FFTH 
 		real(r8), intent(in) :: FF1
@@ -1166,14 +1166,14 @@ contains
 		! flight and outputs a number of parents that will start the oviposition process.
 
 		! Simulating oviposition:
-		call Ovipos(Fec, Parents, med0, Tmin2,Ofma,ONetp,Otm2 NewEggs)
+		call Ovipos(Fec, Parents, med0, Tmin2,Ofma,Gen_mort,Mort_Fec NewEggs)
 		! The output of this subroutine (NewEggs) is input for the next subroutine below.
 		! The Ovipos subroutine also updates the scalar value for fecundity.
 		! It takes as input the number of parents which comes from an initial value
 		! or from the MPBAttack subroutine called at the end of this sequence.
 
 		! Simulating egg development:
-		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,ETPT, NewEggs, NewEggstm1, OE, E, NewL1)
+		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,Mort_ETP, NewEggs, NewEggstm1, OE, E, NewL1)
 		! The output of this subroutine (NewL1) is input for the next subroutine below.
 		! This updates the aging distribution (OE) and NewEggstm1 and
 		! outputs a scalar for the expected number of eggs.
@@ -1210,19 +1210,19 @@ contains
 		NewP = NewP/(1.0_r8 + exp(-(ColdestT - alpha3)/Beta3))
 
 		! Simulating pupal development:
-		call EPTDev(n, avec, med6, mu6, sigma6, Tmin2,ETPT, NewP, NewPtm1, OP, P, NewT)
+		call EPTDev(n, avec, med6, mu6, sigma6, Tmin2,Mort_ETP, NewP, NewPtm1, OP, P, NewT)
 		! The output of this subroutine (NewT) is input for the next subroutine below.
 		! This updates the aging distribution (OP) and  NewPtm1 and
 		! outputs a scalar for the expected number of pupae (P).
 
 		! Simulating teneral adult development:
-		call EPTDev(n, avec, med7, mu7, sigma7, Tmin2,ETPT, NewT, NewTtm1, OT, Te, NewA)
+		call EPTDev(n, avec, med7, mu7, sigma7, Tmin2,Mort_ETP, NewT, NewTtm1, OT, Te, NewA)
 		! The output of this subroutine (NewA) is input for the next subroutine below.
 		! This updates the aging distribution (OT) and  NewTtm1 and
 		! outputs a scalar for the expected number of teneral adults (Te).
 
 		! Simulating adult flight
-		call AdSR(NewA, Tmin2, Tmax2,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A, FA)
+		call AdSR(NewA, Tmin2, Tmax2,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A, FA)
 		! This updates the expected number of adults (A) and flying adults (FA).
 		End Subroutine MPBSim2
 !=================================================================================================================
@@ -1289,7 +1289,7 @@ contains
 
 end subroutine MPBAttack
 !======================================================================================================
-subroutine Ovipos(Fec, Parents, med, Tmn2,Ofmax,ONetp,Otm2,NewEggs)
+subroutine Ovipos(Fec, Parents, med, Tmn2,FecMax,Gen_mort,Mort_Fec,NewEggs)
 
 	! This subroutine simulate oviposition by parent beetles.
 	! The fecundity variable is the number of eggs remaining in the pool.
@@ -1303,29 +1303,29 @@ subroutine Ovipos(Fec, Parents, med, Tmn2,Ofmax,ONetp,Otm2,NewEggs)
 	real(r8), intent(in) :: Parents           ! number of parents doing the ovipositing
 	real(r8), intent(in) :: med               ! median oviposition rate
 	real(r8), intent(in) :: Tmn2              ! minimum temperature under the bark
-	real(r8), intent(in) :: Ofmax             ! Max number of eggs per species. 
-	real(r8), intent(in) :: ONetp             ! This is one minus the probability of dying from a variety of causes.
-	real(r8), intent(in) :: Otm2		  ! Temperature threshold for overwintering adults. 
+	real(r8), intent(in) :: FecMax             ! Max number of eggs per species. 
+	real(r8), intent(in) :: Gen_mort             ! This is one minus the probability of dying from a variety of causes.
+	real(r8), intent(in) :: Mort_Fec		  ! Temperature threshold for overwintering adults. 
 	real(r8), intent(out) :: NewEggs          ! Eggs laid in the time step
 
 	! Applying winter mortality to egg laying adults
-	if(Tmn2 <= Otm2)then
+	if(Tmn2 <= Mort_Fec)then
 		Fec = 0.0_r8
 	end if
 
 	! Computing new eggs. Note this has to be done before updating the
 	! Fec variable below.
-	NewEggs = Fec*(1.0_r8 - exp(-med))*ONetp 
+	NewEggs = Fec*(1.0_r8 - exp(-med))*(1-Gen_mort) 
 
 	! Simulating oviposition: (Fec represents the number of eggs remaining)
 	! each female lays an initial clutch of 82 eggs multiplied by two over three
 	! which is the proportion of the eggs that are female (the model only tracks
 	! female mountain pine beetles).
-	Fec = Parents* Ofmax  + Fec*exp(-med)
+	Fec = Parents* FecMax  + Fec*exp(-med)
 
 end subroutine Ovipos
 !======================================================================================================
-subroutine EPTDev(n, avec, med, mu, sigma, Tmn2,ETPT, NewEPT,NewEPTtm1, OEPT, EPTcurrent, NewNext)
+subroutine EPTDev(n, avec, med, mu, sigma, Tmn2,Mort_ETP, NewEPT,NewEPTtm1, OEPT, EPTcurrent, NewNext)
 
 	! This subroutine advances egg, pupal or teneral adult development and
 	! returns the number of individuals that move into the next stage
@@ -1357,7 +1357,7 @@ subroutine EPTDev(n, avec, med, mu, sigma, Tmn2,ETPT, NewEPT,NewEPTtm1, OEPT, EP
 	real(r8), intent(in) :: sigma             ! scale parameter of the log-normally distributed rate
 	real(r8), intent(in) :: Tmn2              ! the buffered under-bark minimum temperature
 	real(r8), intent(in) :: NewEPT            ! New individuals (just developed from previous stage)
-	real(r8), intent(in) :: ETPT              ! Temperature threshold for EPT death. 
+	real(r8), intent(in) :: Mort_ETP              ! Temperature threshold for EPT death. 
 	real(r8), intent(inout) :: NewEPTtm1      ! New individuals from the previous time step
 	real(r8), intent(inout) :: OEPT(n)     ! Distribution of physiological age
 	real(r8), intent(out) :: EPTcurrent       ! Number of individuals currently in the stage
@@ -1373,8 +1373,8 @@ subroutine EPTDev(n, avec, med, mu, sigma, Tmn2,ETPT, NewEPT,NewEPTtm1, OEPT, EP
 	! in the previous step.
 	OldEPT = OEPT
 
-	! Now ETPT is the general species specific term for EPT death
-	if(Tmn2 <= ETPT)then
+	! Now Mort_ETP is the general species specific term for EPT death
+	if(Tmn2 <= Mort_ETP)then
 		OldEPT = 0.0_r8
 	end if
 
@@ -1496,7 +1496,7 @@ subroutine LarvDev(n, avec, med, mu, sigma, NewL, NewLtm1, OL, Lcurrent, NewNext
 
 end subroutine LarvDev
 !======================================================================================================
-subroutine AdSR(NewA, Tmn2, Tmx2,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6,Adtm1, FA)
+subroutine AdSR(NewA, Tmn2, Tmx2,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6,Adtm1, FA)
 
 	! This subroutine keeps track of the number of mature adults
 	! that have not yet flown and outputs flown adults. This subroutine
@@ -1521,7 +1521,7 @@ subroutine AdSR(NewA, Tmn2, Tmx2,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6,Adtm1, 
 	real(r8), intent(in) :: NewA              ! New adults
 	real(r8), intent(in) :: Tmn2              ! minimum temperature under the bark
 	real(r8), intent(in) :: Tmx2              ! maximum temperature under the bark
-	real(r8), intent(in) :: ADSRT              ! maximum temperature under the bark
+	real(r8), intent(in) :: Mort_Ads              ! maximum temperature under the bark
 	real(r8), intent(in) :: FFTL
 	real(r8), intent(in) :: FFTH
 	real(r8), intent(in) :: FF1
@@ -1536,8 +1536,8 @@ subroutine AdSR(NewA, Tmn2, Tmx2,ADSRT,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6,Adtm1, 
 	! An internal variable
 	real(r8) :: PropFly                       ! The proportion of adult beetles that fly
 
-	! Now ADSRT is a non-species specific parameter for flight death.
-	if(Tmn2 <= ADSRT)then
+	! Now Mort_Ads is a non-species specific parameter for flight death.
+	if(Tmn2 <= Mort_Ads)then
 		Adtm1 = 0.0_r8
 	end if
 
