@@ -402,7 +402,7 @@ module FatesHistoryInterfaceMod
   integer :: ih_fire_fuel_mef_si
   integer :: ih_sum_fuel_si
   integer :: ih_fragmentation_scaler_sl
-
+  integer :: ih_IMAP_eggs
   integer :: ih_nplant_si_scpf
   integer :: ih_gpp_si_scpf
   integer :: ih_npp_totl_si_scpf
@@ -2235,6 +2235,7 @@ end subroutine flush_hvars
                hio_gpp_sec_si_pft      => this%hvars(ih_gpp_sec_si_pft)%r82d, &
                hio_npp_si_pft  => this%hvars(ih_npp_si_pft)%r82d, &
                hio_npp_sec_si_pft      => this%hvars(ih_npp_sec_si_pft)%r82d, &
+               hio_IMAP_eggs_si     => this%hvars(ih_IMAP_eggs)%r81d & !testeggs
                hio_nesterov_fire_danger_si => this%hvars(ih_nesterov_fire_danger_si)%r81d, &
                hio_fire_nignitions_si => this%hvars(ih_fire_nignitions_si)%r81d, &
                hio_fire_fdi_si => this%hvars(ih_fire_fdi_si)%r81d, &
@@ -2618,7 +2619,8 @@ end subroutine flush_hvars
          sites(s)%disturbance_rates_primary_to_secondary(dtype_ifall) +     &
          sites(s)%disturbance_rates_secondary_to_secondary(dtype_ifall)) *  &
          days_per_year
-
+      hio_IMAP_eggs_si(io_si)           = hio_IMAP_eggs_si(io_si)+sites(s)%si_insect%indensity(1,2) !!! will need to normalize
+         
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
       hio_harvest_carbonflux_si(io_si) = sites(s)%mass_balance(element_pos(carbon12_element))%wood_product * AREA_INV
@@ -3590,10 +3592,11 @@ end subroutine flush_hvars
             ccohort => ccohort%taller
          enddo cohortloop ! cohort loop
 
+         
          ! Patch specific variables that are already calculated
          ! These things are all duplicated. Should they all be converted to LL or array structures RF?
          ! define scalar to counteract the patch albedo scaling logic for conserved quantities
-
+         
          ! Update Fire Variables
          hio_spitfire_ros_si(io_si)         = hio_spitfire_ros_si(io_si) + cpatch%ROS_front * cpatch%area * AREA_INV / sec_per_min
          hio_effect_wspeed_si(io_si)        = hio_effect_wspeed_si(io_si) + cpatch%effect_wspeed * cpatch%area * AREA_INV / sec_per_min
@@ -7977,7 +7980,13 @@ end subroutine update_history_hifrq
           use_default='active', avgflag='A', vtype=site_r8, hlms='CLM:ALM',    &
           upfreq=1, ivar=ivar, initialize=initialize_variables,                &
           index = ih_npp_stor_si)
-
+    ! Insect model
+    insect_active_if: if(hlm_use_insect.eq.itrue) then
+    call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_h2oveg_si)
 
     ! PLANT HYDRAULICS
 
