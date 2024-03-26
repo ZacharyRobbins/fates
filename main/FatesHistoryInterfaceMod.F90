@@ -414,7 +414,7 @@ module FatesHistoryInterfaceMod
   integer :: ih_npp_agsw_si_scpf
   integer :: ih_npp_agdw_si_scpf
   integer :: ih_npp_stor_si_scpf
-
+  
   integer :: ih_mortality_canopy_si_scpf
   integer :: ih_mortality_understory_si_scpf
   integer :: ih_m3_mortality_canopy_si_scpf
@@ -6233,6 +6233,11 @@ end subroutine update_history_hifrq
          use_default='active', &
          avgflag='A', vtype=site_r8, hlms='CLM:ALM', upfreq=2, &
          ivar=ivar, initialize=initialize_variables, index = ih_tveg_si )
+    call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_eggs_si)
 
     ! radiation error
 
@@ -7982,11 +7987,7 @@ end subroutine update_history_hifrq
           index = ih_npp_stor_si)
     ! Insect model
    ! insect_active_if: if(hlm_use_insect.eq.itrue) then
-    call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
-             long='Insect Eggs per ha', &
-             use_default='active', avgflag='A', vtype=site_r8,               &
-             hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
-             initialize=initialize_variables, index = ih_IMAP_eggs_si)
+
     !end if insect_active_if
     ! PLANT HYDRAULICS
 
