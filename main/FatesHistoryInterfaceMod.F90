@@ -2619,7 +2619,7 @@ end subroutine flush_hvars
          sites(s)%disturbance_rates_primary_to_secondary(dtype_ifall) +     &
          sites(s)%disturbance_rates_secondary_to_secondary(dtype_ifall)) *  &
          days_per_year
-      hio_IMAP_eggs_si(io_si)           = hio_IMAP_eggs_si(io_si)+sites(s)%si_insect%indensity(1,2) !!! will need to normalize
+      hio_IMAP_eggs_si(io_si)           = (hio_IMAP_eggs_si(io_si)+sites(s)%si_insect%indensity(1,2)) !!! will need to normalize
          
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
@@ -7981,13 +7981,13 @@ end subroutine update_history_hifrq
           upfreq=1, ivar=ivar, initialize=initialize_variables,                &
           index = ih_npp_stor_si)
     ! Insect model
-    insect_active_if: if(hlm_use_insect.eq.itrue) then
+   ! insect_active_if: if(hlm_use_insect.eq.itrue) then
     call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
              long='Insect Eggs per ha', &
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
              initialize=initialize_variables, index = ih_IMAP_eggs_si)
-    end if insect_active_if
+    !end if insect_active_if
     ! PLANT HYDRAULICS
 
     hydro_active_if: if(hlm_use_planthydro.eq.itrue) then
