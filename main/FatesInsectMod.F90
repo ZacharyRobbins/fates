@@ -772,7 +772,7 @@ integer :: NumPatches
 		end if
 		! Simulating adult flight
 		! This updates the expected number of adults (A) and flying adults (FA).
-		call AdSR(NewA, Tmin2, max_airTC,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
+		call AdSR(NewA, Tmin2, mean_airTC,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
 
 	end subroutine WPBSim
 		
