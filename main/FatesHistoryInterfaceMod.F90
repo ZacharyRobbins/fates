@@ -7987,7 +7987,7 @@ end subroutine update_history_hifrq
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
              initialize=initialize_variables, index = ih_h2oveg_si)
-
+    end if insect_active_if
     ! PLANT HYDRAULICS
 
     hydro_active_if: if(hlm_use_planthydro.eq.itrue) then
