@@ -5143,7 +5143,7 @@ end subroutine update_history_hifrq
     use FatesIOVariableKindMod, only : site_size_r8, site_pft_r8, site_age_r8
     use FatesIOVariableKindMod, only : site_coage_pft_r8, site_coage_r8
     use FatesIOVariableKindMod, only : site_height_r8, site_agefuel_r8
-    use FatesInterfaceTypesMod     , only : hlm_use_planthydro
+    use FatesInterfaceTypesMod     , only : hlm_use_planthydro, hlm_use_insect
 
     use FatesIOVariableKindMod, only : site_fuel_r8, site_cwdsc_r8, site_scag_r8
     use FatesIOVariableKindMod, only : site_can_r8, site_cnlf_r8, site_cnlfpft_r8
