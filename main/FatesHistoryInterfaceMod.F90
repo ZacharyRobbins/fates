@@ -402,7 +402,7 @@ module FatesHistoryInterfaceMod
   integer :: ih_fire_fuel_mef_si
   integer :: ih_sum_fuel_si
   integer :: ih_fragmentation_scaler_sl
-  integer :: ih_IMAP_eggs
+  integer :: ih_IMAP_eggs_si
   integer :: ih_nplant_si_scpf
   integer :: ih_gpp_si_scpf
   integer :: ih_npp_totl_si_scpf
@@ -2235,7 +2235,7 @@ end subroutine flush_hvars
                hio_gpp_sec_si_pft      => this%hvars(ih_gpp_sec_si_pft)%r82d, &
                hio_npp_si_pft  => this%hvars(ih_npp_si_pft)%r82d, &
                hio_npp_sec_si_pft      => this%hvars(ih_npp_sec_si_pft)%r82d, &
-               hio_IMAP_eggs_si     => this%hvars(ih_IMAP_eggs)%r81d, & !testeggs
+               hio_IMAP_eggs_si     => this%hvars(ih_IMAP_eggs_si)%r81d, & !testeggs
                hio_nesterov_fire_danger_si => this%hvars(ih_nesterov_fire_danger_si)%r81d, &
                hio_fire_nignitions_si => this%hvars(ih_fire_nignitions_si)%r81d, &
                hio_fire_fdi_si => this%hvars(ih_fire_fdi_si)%r81d, &
@@ -7986,7 +7986,7 @@ end subroutine update_history_hifrq
              long='Insect Eggs per ha', &
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
-             initialize=initialize_variables, index = ih_IMAP_eggs)
+             initialize=initialize_variables, index = ih_IMAP_eggs_si)
     end if insect_active_if
     ! PLANT HYDRAULICS
 
