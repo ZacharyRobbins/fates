@@ -65,8 +65,9 @@ module FatesInsectMemMod
 	
 	! Maximum and minimum daily temperatures in degree C
 	real(r8) :: MaxDailyT                         			
- 	real(r8) :: MinDailyT                          			
-	contains
+ 	real(r8) :: MinDailyT   
+        real(r8) :: MeanDailyT
+	contains 
            procedure  :: InitInsectSite
            procedure  :: ZeroInsectSite
     
