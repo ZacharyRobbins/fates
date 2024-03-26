@@ -81,7 +81,7 @@ contains
     ! at the specific site.
     real(r8) :: max_airTC                   	! maximum daily air temperature (degrees C) in the site at reference height
     real(r8) :: min_airTC                   	! minimum daily air temperature (degrees C) in the site at reference height
-
+    real(r8) :: mean_airTC                   	! mean daily air temperature (degrees C) in the site at reference height
     !! Below are state variables that we track at the site level.
 	
     ! InitInsectSite subroutine these will be allocated with size equal to the domain size.
@@ -177,6 +177,7 @@ integer :: NumPatches
 			NumPatches = 0
 			max_airTC = 0.0_r8
 			min_airTC = 0.0_r8
+			mean_airTC=0.0_r8
 			!We cycle through the patches from oldest to youngest  
 			currentPatch => currentSite%oldest_patch	! starting with the oldest 
 			
@@ -189,9 +190,10 @@ integer :: NumPatches
 				NumPatches = NumPatches + 1
 			
 				! Computing mean temperature averaged across all patches (normalized later)
-				max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
-				min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
-		        	do while (associated(currentCohort))
+				!max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
+				!min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
+		        	mean_airTC = mean_airTC+(bc_in%tgcm_min_pa(iofp)- 273.15_r8)
+				do while (associated(currentCohort))
 	
 					!!!This was altered to allow for the two cohorts, needed in the WPB model.
 					if(currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8)then
@@ -208,15 +210,16 @@ integer :: NumPatches
 			end do	! Patch do loop
 			
 			! Now completing the temperature averaging process.
-			max_airTC = max_airTC/NumPatches
-			min_airTC = min_airTC/NumPatches
-
+			!max_airTC = max_airTC/NumPatches
+			!min_airTC = min_airTC/NumPatches
+                        mean_airTC = mean_airTC/NumPatches
 			! I record the number of trees in each of the size classes prior to attack.
 			Ntm1GEQ317 = NtGEQ317
 			Ntm1GEQ00 = NtGEQ00
 			! Updating the coldest temperature
-			if(min_airTC < ColdestT)then
-				ColdestT = Tmin
+			!if(min_airT < ColdestT)then
+			if(mean_airTC< ColdestT)then
+				ColdestT = mean_airTC
 			end if
 			! Resetting the coldest temperature tracker on July 21 of each year:
 			if(hlm_current_month == 7 .and. hlm_current_day == 21) then
@@ -236,7 +239,8 @@ integer :: NumPatches
 
 			!----------------------------------------------------------------------------------------------------
 			! Calling the full MPB simulation for the time step. 
-			call WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
+			!call WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
+			call WPBSim(mean_airTC, Parents, FA, OE, OL1, OL2, &
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
@@ -316,7 +320,8 @@ integer :: NumPatches
 	end subroutine beetle_model
 ! Western Pine Beetle only functions 
 !==================================================================================================
-	subroutine WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
+!	subroutine WPBSim(max_airTC, min_airTC, Parents, FA, OE, OL1, OL2, &
+	subroutine WPBSim(mean_airTC, Parents, FA, OE, OL1, OL2, &
 			OP, OT,Opare,NewEggstm1, NewParentstm1,NewL1tm1, &
 			NewL2tm1,  NewPtm1, NewTtm1, &
 			Fec, E, L1, L2,  P, Te, A,Pare,ActiveParents, ColdestT, &
@@ -331,8 +336,9 @@ integer :: NumPatches
 		implicit none
 
 		! Here are the input and output variables
-		real(r8), intent(in) :: max_airTC
-		real(r8), intent(in) :: min_airTC
+		!real(r8), intent(in) :: max_airTC
+		!real(r8), intent(in) :: min_airTC
+		real(r8),intent(in) :: mean_airTC
 		real(r8), intent(inout) :: Parents
 		real(r8), intent(inout) :: FA
 
@@ -568,14 +574,17 @@ integer :: NumPatches
 
 !---------------Empirical transformation of air temperature to under bark temperature Ponderosa pine---------!
 	        ! The mean between Tmin(4am) and Tmax(4pm)
-		CMean=(max_airTC+min_airTC)/2
+		!CMean=(max_airTC+min_airTC)/2
 		! The mean between Tmax(4pm) and TminNext (4am the following day)
-		CMean2=(max_airTC+min_airTC)/2
+		!CMean2=(max_airTC+min_airTC)/2
+		
 		! The difference between Tmin and Tmax 
-		CDif=(max_airTC-min_airTC)
+		!CDif=(max_airTC-min_airTC)
+		CDif=10
 		! The difference between Tmax and T min Next 
-		CDif2=(max_airTC-min_airTC)
-		! This is the implementation of the Sine Cycle for each of the time periods in the model. 
+		!CDif2=(max_airTC-min_airTC)
+		CDif2=10
+                ! This is the implementation of the Sine Cycle for each of the time periods in the model. 
 		fouram=3.8532+(min_airTC*.9677)
 		sevenam=1.86978+(.93522*(CMean+(.5*CDif*(-0.7071068))))
 		tenam=(-.4533)+(1.00899*(CMean))
@@ -687,7 +696,7 @@ integer :: NumPatches
 		! This prevents them from killing trees when they shouldn't be.
 	!	 If temperatures are cold, all of the flying beetles die. This prevents them
 		! from killing trees when they should not be. The value of -10*C is from Miller and Keen 
-		if(min_airTC < -10.0)then
+		if(mean_airTC < -10.0)then
 			Bt = 0.0
 			FA = 0.0
 		end if
@@ -705,7 +714,7 @@ integer :: NumPatches
 		call EPTDev(n, avec, medA, muA, sigmaA, Tmin2,Mort_ETP, Parents, NewParentstm1, OPare, Pare, ActiveParents)
 		! Simulating oviposition:
 		call Ovipos(Fec, ActiveParents, med0, Tmin2,FecMax,Gen_mort,Mort_Fec, NewEggs)
-		! The output of this subroutine (NewEggs) is input for the next subroutine below.
+		! Th0e output of this subroutine (NewEggs) is input for the next subroutine below.
 		! The Ovipos subroutine also updates the scalar value for fecundity.
 		! It takes as input the number of parents which comes from an initial value
 		! or from the MPBAttack subroutine called at the end of this sequence.
