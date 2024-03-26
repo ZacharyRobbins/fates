@@ -130,11 +130,6 @@ integer :: NumPatches
 !!!=====================================================================================
 !=====   Start WPB Processor===================
 !!!=====================================================================================
-		select case(insectType)
-		case(2)
-
-
-			
 			! number of patches in the site
 			
 			
@@ -192,7 +187,7 @@ integer :: NumPatches
 				! Computing mean temperature averaged across all patches (normalized later)
 				!max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
 				!min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
-		        	mean_airTC = mean_airTC + (bc_in%tgcm_min_pa(iofp)- 273.15_r8)
+		        	mean_airTC = mean_airTC + (bc_in%tgcm_pa(iofp)- 273.15_r8)
 				do while (associated(currentCohort))
 	
 					!!!This was altered to allow for the two cohorts, needed in the WPB model.
@@ -313,10 +308,8 @@ integer :: NumPatches
 			currentSite%si_insect%In_PopN = In_PopN
 
 			! Daily maximum and minimum temperatures for diagnostic purposes
-			currentSite%si_insect%MaxDailyT = max_airTC
-			currentSite%si_insect%MinDailyT = min_airTC
-		!! In case of no case 
-		end select
+			!currentSite%si_insect%MaxDailyT = max_airTC
+			!currentSite%si_insect%MinDailyT = min_airTC
 	end subroutine beetle_model
 ! Western Pine Beetle only functions 
 !==================================================================================================
