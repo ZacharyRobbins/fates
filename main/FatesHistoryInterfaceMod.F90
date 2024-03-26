@@ -7986,7 +7986,7 @@ end subroutine update_history_hifrq
              long='Insect Eggs per ha', &
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=4, ivar=ivar,                              &
-             initialize=initialize_variables, index = ih_h2oveg_si)
+             initialize=initialize_variables, index = ih_IMAP_eggs)
     end if insect_active_if
     ! PLANT HYDRAULICS
 
