@@ -177,7 +177,7 @@ integer :: NumPatches
 			NumPatches = 0
 			max_airTC = 0.0_r8
 			min_airTC = 0.0_r8
-			mean_airTC=0.0_r8
+			mean_airTC = 0.0_r8
 			!We cycle through the patches from oldest to youngest  
 			currentPatch => currentSite%oldest_patch	! starting with the oldest 
 			
@@ -192,7 +192,7 @@ integer :: NumPatches
 				! Computing mean temperature averaged across all patches (normalized later)
 				!max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
 				!min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
-		        	mean_airTC = mean_airTC+(bc_in%tgcm_min_pa(iofp)- 273.15_r8)
+		        	mean_airTC = mean_airTC + (bc_in%tgcm_min_pa(iofp)- 273.15_r8)
 				do while (associated(currentCohort))
 	
 					!!!This was altered to allow for the two cohorts, needed in the WPB model.
@@ -338,7 +338,7 @@ integer :: NumPatches
 		! Here are the input and output variables
 		!real(r8), intent(in) :: max_airTC
 		!real(r8), intent(in) :: min_airTC
-		real(r8),intent(in) :: mean_airTC
+		real(r8), intent(in)    :: mean_airTC
 		real(r8), intent(inout) :: Parents
 		real(r8), intent(inout) :: FA
 
@@ -577,7 +577,8 @@ integer :: NumPatches
 		!CMean=(max_airTC+min_airTC)/2
 		! The mean between Tmax(4pm) and TminNext (4am the following day)
 		!CMean2=(max_airTC+min_airTC)/2
-		
+		CMean=mean_airTC
+		CMean2=mean_airTC
 		! The difference between Tmin and Tmax 
 		!CDif=(max_airTC-min_airTC)
 		CDif=10
@@ -585,7 +586,7 @@ integer :: NumPatches
 		!CDif2=(max_airTC-min_airTC)
 		CDif2=10
                 ! This is the implementation of the Sine Cycle for each of the time periods in the model. 
-		fouram=3.8532+(min_airTC*.9677)
+		fouram=3.8532+(mean_airTC*.9677)
 		sevenam=1.86978+(.93522*(CMean+(.5*CDif*(-0.7071068))))
 		tenam=(-.4533)+(1.00899*(CMean))
 		onepm=(-1.148846)+(.985801*(CMean+(.5*CDif*0.7071068)))
