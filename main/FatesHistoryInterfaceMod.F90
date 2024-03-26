@@ -2619,7 +2619,7 @@ end subroutine flush_hvars
          sites(s)%disturbance_rates_primary_to_secondary(dtype_ifall) +     &
          sites(s)%disturbance_rates_secondary_to_secondary(dtype_ifall)) *  &
          days_per_year
-      hio_IMAP_eggs_si(io_si)           = sites(s)%si_insect%Transit(1)!!! will need to normalize
+      #hio_IMAP_eggs_si(io_si)           = sites(s)%si_insect%Transit(1)!!! will need to normalize
          
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
