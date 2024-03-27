@@ -22,6 +22,7 @@ module EDMainMod
   use FatesInterfaceTypesMod        , only : hlm_use_tree_damage
   use FatesInterfaceTypesMod        , only : hlm_use_ed_st3
   use FatesInterfaceTypesMod        , only : hlm_use_sp
+  use FatesInterfaceTypesMod         , only : hlm_use_insect
   use FatesInterfaceTypesMod        , only : bc_in_type
   use FatesInterfaceTypesMod        , only : bc_out_type
   use FatesInterfaceTypesMod        , only : hlm_masterproc
@@ -60,6 +61,7 @@ module EDMainMod
   use FatesSoilBGCFluxMod      , only : PrepNutrientAquisitionBCs
   use FatesSoilBGCFluxMod      , only : PrepCH4BCs
   use SFMainMod                , only : fire_model
+  use FatesInsectMod           , only : insect_model
   use FatesSizeAgeTypeIndicesMod, only : get_age_class_index
   use FatesSizeAgeTypeIndicesMod, only : coagetype_class_index
   use FatesLitterMod           , only : litter_type
@@ -218,7 +220,12 @@ contains
        if (currentSite%youngest_patch%patchno .ne. 0) then 
           call fire_model(currentSite, bc_in)
        end if
-
+    !Insect plugin-ZR
+    if (hlm_use_ed_st3.eq.ifalse.and.hlm_use_sp.eq.ifalse) then   ! Bypass if ST3
+       ! Don't run on bare patch, see sf. 
+       if (currentSite%youngest_patch%patchno .ne. 0) then 
+          call insect_model(currentSite, bc_in)
+       end if
        ! Calculate disturbance and mortality based on previous timestep vegetation.
        ! disturbance_rates calls logging mortality and other mortalities, Yi Xu
        call disturbance_rates(currentSite, bc_in)
