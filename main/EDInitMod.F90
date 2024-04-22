@@ -690,12 +690,18 @@ contains
 
        enddo !s
     end if
-
+    !!! Addition for insect model -ZR 
+    if(hlm_use_insect.eq.itrue) then
+		do s = 1, nsites
+			!allocate(sites(s)%si_insect)
+        	      	call InitInsectSite(sites(s)%si_insect)
+		enddo
+     endif
      ! zero all the patch fire variables for the first timestep
     do s = 1, nsites
       currentPatch => sites(s)%youngest_patch
       do while(associated(currentPatch))
-
+         
          currentPatch%litter_moisture(:)         = 0._r8
          currentPatch%fuel_eff_moist             = 0._r8
          currentPatch%livegrass                  = 0._r8
