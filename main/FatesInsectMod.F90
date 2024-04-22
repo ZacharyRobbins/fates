@@ -133,8 +133,8 @@ integer :: NumPatches
 			! number of patches in the site
 			
 			
-			OE = currentSite%si_insect%PhysAge(:,1)
-			OL1 = currentSite%si_insect%PhysAge(:,2)
+OE = currentSite%si_insect%PhysAge(:,1)
+OL1 = currentSite%si_insect%PhysAge(:,2)
 			OL2 = currentSite%si_insect%PhysAge(:,3)
 			OP = currentSite%si_insect%PhysAge(:,4)
 			OT = currentSite%si_insect%PhysAge(:,5)
