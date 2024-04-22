@@ -160,6 +160,7 @@ contains
     if(hlm_use_insect.eq.itrue) then
         allocate(site_in%si_insect)
         allocate(site_in%inmort_rate(1:nlevsclass,1:numpft))
+        call InitInsectSite(site_in%si_insect)
     endif
     allocate(site_in%term_carbonflux_canopy(1:numpft))
     allocate(site_in%term_carbonflux_ustory(1:numpft))
@@ -205,12 +206,7 @@ contains
     site_in%z_soil(:)  = bc_in%z_sisl(:)
 
     !!! Addition for insect model -ZR 
-    if(hlm_use_insect.eq.itrue) then
-		do s = 1, nsites
-			allocate(sites(s)%si_insect)
-        	      	call InitInsectSite(sites(s)%si_insect)
-		enddo
-     endif
+
   end subroutine init_site_vars
 
   ! ============================================================================
