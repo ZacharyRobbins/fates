@@ -167,42 +167,42 @@ contains
 	ColdestT = currentSite%si_insect%ColdestT
 	In_PopN = currentSite%si_insect%In_PopN
 	
-			NtGEQ317 = 0.0_r8
-			NtGEQ00 = 0.0_r8
-			NumPatches = 0
-			max_airTC = 0.0_r8
-			min_airTC = 0.0_r8
-			mean_airTC = 0.0_r8
-			!We cycle through the patches from oldest to youngest  
-			currentPatch => currentSite%oldest_patch	! starting with the oldest 
-			
-			do while (associated(currentPatch))
+	NtGEQ317 = 0.0_r8
+	NtGEQ00 = 0.0_r8
+	NumPatches = 0
+	max_airTC = 0.0_r8
+	min_airTC = 0.0_r8
+	mean_airTC = 0.0_r8
+	!We cycle through the patches from oldest to youngest  
+	currentPatch => currentSite%oldest_patch	! starting with the oldest 
+	
+	do while (associated(currentPatch))
 
-				iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
-				currentCohort => currentPatch%tallest
-			
-				! Computing patch numbers
-				NumPatches = NumPatches + 1
-			
+			iofp = currentPatch%patchno             ! This is needed to get the relevant temperature variables from bc_in
+			currentCohort => currentPatch%tallest
+		
+			! Computing patch numbers
+			NumPatches = NumPatches + 1
+		
 				! Computing mean temperature averaged across all patches (normalized later)
 				!max_airTC = max_airTC + (bc_in%tgcm_max_pa(iofp) - 273.15_r8 - 2.762601_r8)
 				!min_airTC = min_airTC + (bc_in%tgcm_min_pa(iofp) - 273.15_r8 - 4.777561_r8)
 		        	mean_airTC = mean_airTC + (bc_in%tgcm_pa(iofp)- 273.15_r8)
-				do while (associated(currentCohort))
-	
-					!!!This was altered to allow for the two cohorts, needed in the WPB model.
-					if(currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8)then
-						NtGEQ317 = NtGEQ317 + currentCohort%n*(currentPatch%area/10000.0_r8)
-					end if
-					if(currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. currentCohort%dbh <=10.0_r8)then
-						NtGEQ00 = NtGEQ00 + currentCohort%n*(currentPatch%area/10000.0_r8)
-					end if
-					currentCohort => currentCohort%shorter
+			do while (associated(currentCohort))
 
-				end do ! This ends the cohort do loop
-				currentPatch => currentPatch%younger
+				!!!This was altered to allow for the two cohorts, needed in the WPB model.
+				if(currentCohort%pft == 2 .and. currentCohort%dbh >= 31.6_r8)then
+					NtGEQ317 = NtGEQ317 + currentCohort%n*(currentPatch%area/10000.0_r8)
+				end if
+				if(currentCohort%pft == 2 .and. currentCohort%dbh <= 31.6_r8 .and. currentCohort%dbh <=10.0_r8)then
+					NtGEQ00 = NtGEQ00 + currentCohort%n*(currentPatch%area/10000.0_r8)
+				end if
+				currentCohort => currentCohort%shorter
+
+			end do ! This ends the cohort do loop
+			currentPatch => currentPatch%younger
 			
-			end do	! Patch do loop
+		end do	! Patch do loop
 			
 			! Now completing the temperature averaging process.
 			!max_airTC = max_airTC/NumPatches

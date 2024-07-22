@@ -157,7 +157,7 @@ contains
        allocate(site_in%fmort_cflux_canopy_damage(1,1))
        allocate(site_in%fmort_cflux_ustory_damage(1,1))
     end if
-    ### Zr test. 
+    !!! Zr test. 
     allocate(site_in%si_insect)
     allocate(site_in%inmort_rate(1:nlevsclass,1:numpft))
     call InitInsectSite(site_in%si_insect)

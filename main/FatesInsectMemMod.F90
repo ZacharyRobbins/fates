@@ -42,35 +42,35 @@ module FatesInsectMemMod
     type ed_site_insect_type
         !variables for tracking insect dynamics
 	
-	! array to define the preference of insects (0-not preferred; 1-preferred)
-	integer, allocatable :: InsectPFTPref(:,:)	
+		! array to define the preference of insects (0-not preferred; 1-preferred)
+		integer, allocatable :: InsectPFTPref(:,:)	
 
-        ! Containers for the distributions of physiological age for each life stage. 
-	! The PhysAge array holds physiological age distributions for each of the relevant stages of the beetles.
-	real(r8), allocatable :: PhysAge(:,:)		! array to hold physiological age for eggs, L1, L2, L3, L4, P, T
-	
-	! Containers for densities of insects transitioning from one stage to another for each insect type.
-	! The Transit array holds beetles trasitionaing into the egg life stage, into L1, into L2, into L3, 
-	! into L4, into the pupal stage, into the teneral adult life stage (currently 7 stages).
-	real(r8), allocatable :: Transit(:)
-	
-	!insect density for different insect types and stages
-	! Note that for the mountain pine beetle densities (insect type 1--first row)
-	! are expressed as (nper 225 m^2). This does not have to be the case for other insect species.
-    real(r8), allocatable :: indensity(:,:) 	 
-	
-        ! Variables related to mountain pine beetle winter survival (these are specific to the mountain pine beetle)
-     real(r8) :: ColdestT                         			! coldest winter temperature experienced to date (resets on a yearly basis)
-	real(r8) :: In_PopN                         			! a cencus of population that is used to decide whether insects attack trees
-	
-	! Maximum and minimum daily temperatures in degree C
-	real(r8) :: MaxDailyT                         			
- 	real(r8) :: MinDailyT   
-        real(r8) :: MeanDailyT
-	contains 
-           procedure  :: InitInsectSite
-           procedure  :: ZeroInsectSite
-    
+			! Containers for the distributions of physiological age for each life stage. 
+		! The PhysAge array holds physiological age distributions for each of the relevant stages of the beetles.
+		real(r8), allocatable :: PhysAge(:,:)		! array to hold physiological age for eggs, L1, L2, L3, L4, P, T
+		
+		! Containers for densities of insects transitioning from one stage to another for each insect type.
+		! The Transit array holds beetles trasitionaing into the egg life stage, into L1, into L2, into L3, 
+		! into L4, into the pupal stage, into the teneral adult life stage (currently 7 stages).
+		real(r8), allocatable :: Transit(:)
+		
+		!insect density for different insect types and stages
+		! Note that for the mountain pine beetle densities (insect type 1--first row)
+		! are expressed as (nper 225 m^2). This does not have to be the case for other insect species.
+		real(r8), allocatable :: indensity(:,:) 	 
+		
+			! Variables related to mountain pine beetle winter survival (these are specific to the mountain pine beetle)
+		real(r8) :: ColdestT                         			! coldest winter temperature experienced to date (resets on a yearly basis)
+		real(r8) :: In_PopN                         			! a cencus of population that is used to decide whether insects attack trees
+		
+		! Maximum and minimum daily temperatures in degree C
+		real(r8) :: MaxDailyT                         			
+		real(r8) :: MinDailyT   
+			real(r8) :: MeanDailyT
+		contains 
+			   procedure  :: InitInsectSite
+			   procedure  :: ZeroInsectSite
+		
     end type ed_site_insect_type
 
     contains
