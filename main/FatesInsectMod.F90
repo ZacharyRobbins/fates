@@ -114,59 +114,59 @@ contains
 			! related to the winter mortality model for mountain pine beetle:
     real(r8) :: ColdestT                       	! Coldest yearly temperature experienced to date.
 
-! Current host tree densities for insects (in this case for mountain pine beetle) per ha
-! Averaged over all patches within each site.
-real(r8) :: NtGEQ317				! initial susceptible host trees in the 20+ cm dbh size class
-real(r8) :: NtGEQ00
-! I also make the equivalent container for the density of hosts prior to insect attack so that we can compute
-! the proportion that died in the current step (daily time step).
-real(r8) :: Ntm1GEQ317            		! previous susceptible host trees in the 20+ cm dbh size class
-real(r8) :: Ntm1GEQ00
-! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
-real(r8) :: In_PopN         		! current total population of insects estimated on Oct first (end of flight season)
-integer :: NumPatches
-!real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
-!Parameter above now intialized in InsectMemMod 		
-!!!=====================================================================================
-!=====   Start WPB Processor===================
-!!!=====================================================================================
-			! number of patches in the site
+	! Current host tree densities for insects (in this case for mountain pine beetle) per ha
+	! Averaged over all patches within each site.
+	real(r8) :: NtGEQ317				! initial susceptible host trees in the 20+ cm dbh size class
+	real(r8) :: NtGEQ00
+	! I also make the equivalent container for the density of hosts prior to insect attack so that we can compute
+	! the proportion that died in the current step (daily time step).
+	real(r8) :: Ntm1GEQ317            		! previous susceptible host trees in the 20+ cm dbh size class
+	real(r8) :: Ntm1GEQ00
+	! Here are variables that I use to decide whether to restart the mountain pine beetle population at endemic population levels
+	real(r8) :: In_PopN         		! current total population of insects estimated on Oct first (end of flight season)
+	integer :: NumPatches
+	!real(r8), parameter :: EndWPBPopn = 40.0_r8 ! The minimum endemic parent mountain pine beetle population (female) per ha
+	!Parameter above now intialized in InsectMemMod 		
+	!!!=====================================================================================
+	!=====   Start WPB Processor===================
+	!!!=====================================================================================
+				! number of patches in the site
 			
 			
-OE = currentSite%si_insect%PhysAge(:,1)
-OL1 = currentSite%si_insect%PhysAge(:,2)
-			OL2 = currentSite%si_insect%PhysAge(:,3)
-			OP = currentSite%si_insect%PhysAge(:,4)
-			OT = currentSite%si_insect%PhysAge(:,5)
-			OPare = currentSite%si_insect%PhysAge(:,6)
-			! The transitioning individuals from one life stage to another.
-			NewEggstm1 = currentSite%si_insect%Transit(1)
-			NewL1tm1 = currentSite%si_insect%Transit(2)
-			NewL2tm1 = currentSite%si_insect%Transit(3)
-			NewPtm1 = currentSite%si_insect%Transit(4)
-			NewTtm1 = currentSite%si_insect%Transit(5)
-			NewParentstm1= currentSite%si_insect%Transit(6)
-			! The one in the row argument of the indensity array corresponds to mountain pine beetle
-			! (insect type 1). The number in the column argument of the array refers to the
-			! life stage: 1->Fec, 2->Eggs, 3->L1, 4->L2, 5->Pupae,
-			! 6->Teneral adults, 7->Adults, 8->Flown Adults, 9->flying beetles from previous step (Bt),
-			! 10->Parents (flown adults that successfully attacked trees that day--daily time step)
-			! Columns 11 to 20 of the indensity array are empty for the western pine beetle.
-			Fec = currentSite%si_insect%indensity(1,1)
-			E = currentSite%si_insect%indensity(1,2)
-			L1 = currentSite%si_insect%indensity(1,3)
-			L2 = currentSite%si_insect%indensity(1,4)
-			P = currentSite%si_insect%indensity(1,5)
-			Te = currentSite%si_insect%indensity(1,6)
-			A = currentSite%si_insect%indensity(1,7)
-			FA = currentSite%si_insect%indensity(1,8)
-			Bt = currentSite%si_insect%indensity(1,9)
-			Pare = CurrentSite%si_insect%indensity(1,10)
-			ActiveParents = CurrentSite%si_insect%indensity(1,11)
-			
-			ColdestT = currentSite%si_insect%ColdestT
-			In_PopN = currentSite%si_insect%In_PopN
-			
+	OE = currentSite%si_insect%PhysAge(:,1)
+	OL1 = currentSite%si_insect%PhysAge(:,2)
+	OL2 = currentSite%si_insect%PhysAge(:,3)
+	OP = currentSite%si_insect%PhysAge(:,4)
+	OT = currentSite%si_insect%PhysAge(:,5)
+	OPare = currentSite%si_insect%PhysAge(:,6)
+	! The transitioning individuals from one life stage to another.
+	NewEggstm1 = currentSite%si_insect%Transit(1)
+	NewL1tm1 = currentSite%si_insect%Transit(2)
+	NewL2tm1 = currentSite%si_insect%Transit(3)
+	NewPtm1 = currentSite%si_insect%Transit(4)
+	NewTtm1 = currentSite%si_insect%Transit(5)
+	NewParentstm1= currentSite%si_insect%Transit(6)
+	! The one in the row argument of the indensity array corresponds to mountain pine beetle
+	! (insect type 1). The number in the column argument of the array refers to the
+	! life stage: 1->Fec, 2->Eggs, 3->L1, 4->L2, 5->Pupae,
+	! 6->Teneral adults, 7->Adults, 8->Flown Adults, 9->flying beetles from previous step (Bt),
+	! 10->Parents (flown adults that successfully attacked trees that day--daily time step)
+	! Columns 11 to 20 of the indensity array are empty for the western pine beetle.
+	Fec = currentSite%si_insect%indensity(1,1)
+	E = currentSite%si_insect%indensity(1,2)
+	L1 = currentSite%si_insect%indensity(1,3)
+	L2 = currentSite%si_insect%indensity(1,4)
+	P = currentSite%si_insect%indensity(1,5)
+	Te = currentSite%si_insect%indensity(1,6)
+	A = currentSite%si_insect%indensity(1,7)
+	FA = currentSite%si_insect%indensity(1,8)
+	Bt = currentSite%si_insect%indensity(1,9)
+	Pare = CurrentSite%si_insect%indensity(1,10)
+	ActiveParents = CurrentSite%si_insect%indensity(1,11)
+	
+	ColdestT = currentSite%si_insect%ColdestT
+	In_PopN = currentSite%si_insect%In_PopN
+	
 			NtGEQ317 = 0.0_r8
 			NtGEQ00 = 0.0_r8
 			NumPatches = 0

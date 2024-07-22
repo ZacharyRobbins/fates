@@ -57,10 +57,10 @@ module FatesInsectMemMod
 	!insect density for different insect types and stages
 	! Note that for the mountain pine beetle densities (insect type 1--first row)
 	! are expressed as (nper 225 m^2). This does not have to be the case for other insect species.
-        real(r8), allocatable :: indensity(:,:) 	 
+    real(r8), allocatable :: indensity(:,:) 	 
 	
         ! Variables related to mountain pine beetle winter survival (these are specific to the mountain pine beetle)
-        real(r8) :: ColdestT                         			! coldest winter temperature experienced to date (resets on a yearly basis)
+     real(r8) :: ColdestT                         			! coldest winter temperature experienced to date (resets on a yearly basis)
 	real(r8) :: In_PopN                         			! a cencus of population that is used to decide whether insects attack trees
 	
 	! Maximum and minimum daily temperatures in degree C
@@ -83,28 +83,28 @@ module FatesInsectMemMod
         ! argument
         class(ed_site_insect_type), intent(inout) :: this
 	
-	! initialize the preference, but will move to the parameter file later
+		! initialize the preference, but will move to the parameter file later
 
 		 ! WPB
-	allocate(this%InsectPFTPref(1:numberInsectTypes, 1:maxpft))
-	this%InsectPFTPref = 0 
-	this%InsectPFTPref(1,2)= 1					! Resolve this for WPB!!!!!!!!!!!!!!!!!!!!!!!!
-			
-	allocate(this%PhysAge(1:DomainSize,1:6))
-	this%PhysAge(1:DomainSize, 1:6) = 0.0_r8
-			
-	allocate(this%Transit(1:6))
-	this%Transit(1:5) = 0.0_r8
-			
-	allocate(this%indensity(1:numberInsectTypes, 1:maxNumStages))	
-	this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
+		allocate(this%InsectPFTPref(1:numberInsectTypes, 1:maxpft))
+		this%InsectPFTPref = 0 
+		this%InsectPFTPref(1,2)= 1					! Resolve this for WPB!!!!!!!!!!!!!!!!!!!!!!!!
+				
+		allocate(this%PhysAge(1:DomainSize,1:6))
+		this%PhysAge(1:DomainSize, 1:6) = 0.0_r8
+				
+		allocate(this%Transit(1:6))
+		this%Transit(1:5) = 0.0_r8
+				
+		allocate(this%indensity(1:numberInsectTypes, 1:maxNumStages))	
+		this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
 
-	this%ColdestT = 15.0_r8
-		
-	! As model runs typically start January 1, 
-	! I have decided to initialize with non-reactive temperatures for insects.
-	this%MaxDailyT = 0.0_r8
-	this%MinDailyT = 0.0_r8
+		this%ColdestT = 15.0_r8
+			
+		! As model runs typically start January 1, 
+		! I have decided to initialize with non-reactive temperatures for insects.
+		this%MaxDailyT = 0.0_r8
+		this%MinDailyT = 0.0_r8
     end subroutine InitInsectSite
     
     !==========================================================================================================
@@ -113,18 +113,18 @@ module FatesInsectMemMod
         ! argument
         class(ed_site_insect_type), intent(inout) :: this
 
-	! initialize the preference, but will move to the parameter file later
-	this%InsectPFTPref = 0 
-	this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
-	this%PhysAge(1:DomainSize, 1:5) = 0.0_r8
-	this%Transit(1:5) = 0.0_r8
-	this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
-	this%ColdestT = 0.0_r8
-	this%In_PopN   = 0.0_r8
-	! As model runs typically start January 1, 
-	! I have decided to initialize with non-reactive temperatures for insects.
-	this%MaxDailyT = 0.0_r8
-	this%MinDailyT = 0.0_r8
+		! initialize the preference, but will move to the parameter file later
+		this%InsectPFTPref = 0 
+		this%InsectPFTPref(1,2)= 1					! This is currently initialized only for mountain pine beetle
+		this%PhysAge(1:DomainSize, 1:5) = 0.0_r8
+		this%Transit(1:5) = 0.0_r8
+		this%indensity(1:numberInsectTypes, 1:maxNumStages) = 0.0_r8
+		this%ColdestT = 0.0_r8
+		this%In_PopN   = 0.0_r8
+		! As model runs typically start January 1, 
+		! I have decided to initialize with non-reactive temperatures for insects.
+		this%MaxDailyT = 0.0_r8
+		this%MinDailyT = 0.0_r8
 	
 
     end subroutine ZeroInsectSite

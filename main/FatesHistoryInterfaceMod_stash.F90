@@ -402,7 +402,13 @@ module FatesHistoryInterfaceMod
   integer :: ih_fire_fuel_mef_si
   integer :: ih_sum_fuel_si
   integer :: ih_fragmentation_scaler_sl
-  integer :: ih_IMAP_eggs_si
+  integer :: ih_IMAP_Fec_si
+  integer :: ih_IMAP_Eggs_si
+  integer :: ih_IMAP_L1_si
+  integer :: ih_IMAP_L2_si
+  integer :: ih_IMAP_P_si
+  integer :: ih_IMAP_Te_si
+  integer :: ih_IMAP_FA_si
   integer :: ih_nplant_si_scpf
   integer :: ih_gpp_si_scpf
   integer :: ih_npp_totl_si_scpf
@@ -2235,7 +2241,14 @@ end subroutine flush_hvars
                hio_gpp_sec_si_pft      => this%hvars(ih_gpp_sec_si_pft)%r82d, &
                hio_npp_si_pft  => this%hvars(ih_npp_si_pft)%r82d, &
                hio_npp_sec_si_pft      => this%hvars(ih_npp_sec_si_pft)%r82d, &
+               !. IMAP edits
+               hio_IMAP_Fec_si     => this%hvars(ih_IMAP_Fec_si)%r81d, & !testFec
                hio_IMAP_eggs_si     => this%hvars(ih_IMAP_eggs_si)%r81d, & !testeggs
+               hio_IMAP_L1_si     => this%hvars(ih_IMAP_L1_si)%r81d, & !testL1
+               hio_IMAP_L2_si     => this%hvars(ih_IMAP_L2_si)%r81d, & !testL2
+               hio_IMAP_P_si     => this%hvars(ih_IMAP_P_si)%r81d, & !testPupae
+               hio_IMAP_Te_si     => this%hvars(ih_IMAP_Te_si)%r81d, & !testTeneralAdults
+               hio_IMAP_FA_si     => this%hvars(ih_IMAP_FA_si)%r81d, & !testFlyingadults
                hio_nesterov_fire_danger_si => this%hvars(ih_nesterov_fire_danger_si)%r81d, &
                hio_fire_nignitions_si => this%hvars(ih_fire_nignitions_si)%r81d, &
                hio_fire_fdi_si => this%hvars(ih_fire_fdi_si)%r81d, &
@@ -2619,8 +2632,17 @@ end subroutine flush_hvars
          sites(s)%disturbance_rates_primary_to_secondary(dtype_ifall) +     &
          sites(s)%disturbance_rates_secondary_to_secondary(dtype_ifall)) *  &
          days_per_year
-      !hio_IMAP_eggs_si(io_si)            =sites(s)%crownarea_canopy_damage
-      hio_IMAP_eggs_si(io_si)           = sites(s)%si_insect%Transit(1)!!! will need to normalize
+      
+      
+      hio_IMAP_eggs_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_L1_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_L2_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_P_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_Te_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_P_si(io_si)            =sites(s)%crownarea_canopy_damage
+      hio_IMAP_FA_si(io_si)            =sites(s)%crownarea_canopy_damage
+      
+      !hio_IMAP_eggs_si(io_si)           = sites(s)%si_insect%Transit(1)!!! will need to normalize
          
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
@@ -6228,25 +6250,47 @@ end subroutine update_history_hifrq
          use_default='active', &
          avgflag='A', vtype=site_r8, hlms='CLM:ALM', upfreq=1, &
          ivar=ivar, initialize=initialize_variables, index = ih_tveg24_si )
-
+    ! IMAPS 
     call this%set_history_var(vname='FATES_TVEG', units='degree_Celsius', &
          long='fates instantaneous mean vegetation temperature by site', &
          use_default='active', &
          avgflag='A', vtype=site_r8, hlms='CLM:ALM', upfreq=2, &
          ivar=ivar, initialize=initialize_variables, index = ih_tveg_si )
-    
+   call this%set_history_var(vname='Fecundity', units = 'kg m-2',       &
+             long='Insect Fecundity per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_Fec_si)
 	call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
              long='Insect Eggs per ha', &
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
              initialize=initialize_variables, index = ih_IMAP_eggs_si)
-
-   ! call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
-   !          long='Insect Eggs per ha', &
-   !          use_default='active', avgflag='A', vtype=site_r8,               &
-   !          hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
-   !          initialize=initialize_variables, index = ih_IMAP_eggs_si)
-
+    call this%set_history_var(vname='Larvaestage1', units = 'kg m-2',       &
+             long='Larvae Stage1 per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_L1_si)
+    call this%set_history_var(vname='FATES_IMAP_Larvaestage2', units = 'kg m-2',       &
+             long='Larvae Stage2 per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_L2_si)
+    call this%set_history_var(vname='FATES_IMAP_P', units = 'kg m-2',       &
+             long='Larvae Stage2 per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_P_si)
+    call this%set_history_var(vname='FATES_IMAP_Te', units = 'kg m-2',       &
+             long='IMAP Teneral Adults per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_Te_si)
+    call this%set_history_var(vname='FATES_IMAP_FA', units = 'kg m-2',       &
+             long='IMAP Flying Adults per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_FA_si)
     ! radiation error
 
     call this%set_history_var(vname='FATES_RAD_ERROR', units='W m-2 ',          &
