@@ -1834,7 +1834,14 @@ contains
 	        case('use_insect')
                hlm_use_insect = ival
                if (fates_global_verbose()) then
-                  write(fates_log(),*) 'Transfering hlm_use_insect ',ival,' to FATES'
+	       write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+               write(fates_log(), *) ''
+               write(fates_log(), *) ' use_fates_IMAP is an      EXPERIMENTAL FEATURE        '
+               write(fates_log(), *) ' This is a check that the model is running'
+               write(fates_log(), *) ' for more information.'
+               write(fates_log(), *) ''
+               write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+               write(fates_log(),*) 'Transfering hlm_use_insect ',ival,' to FATES'
                end if
             case('use_ed_st3')
                hlm_use_ed_st3 = ival
