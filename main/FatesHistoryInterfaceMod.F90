@@ -2638,7 +2638,7 @@ end subroutine flush_hvars
       hio_IMAP_P_si(io_si)             = sites(s)%si_insect%Transit(4)!!! will need to normalize
       hio_IMAP_T_si(io_si)             = sites(s)%si_insect%Transit(5)!!! will need to normalize
       !hio_IMAP_FA_si(io_si)            = sites(s)%si_insect%Transit(5)!!! will need to normalize
-      hio_IMAP_In_PopN_si(io_si)       = sites(s)%si_insect%TInPopN  !!! will need to normalize
+      hio_IMAP_In_PopN_si(io_si)       = sites(s)%si_insect%In_PopN  !!! will need to normalize
          
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
