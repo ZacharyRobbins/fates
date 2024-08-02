@@ -403,6 +403,12 @@
   integer :: ih_sum_fuel_si
   integer :: ih_fragmentation_scaler_sl
   integer :: ih_IMAP_eggs_si
+  integer :: ih_IMAP_L1_si
+  integer :: ih_IMAP_L2_si
+  integer :: ih_IMAP_P_si
+  integer :: ih_IMAP_T_si
+  integer :: ih_IMAP_FA_si
+  integer :: ih_In_PopN
   integer :: ih_nplant_si_scpf
   integer :: ih_gpp_si_scpf
   integer :: ih_npp_totl_si_scpf
@@ -2236,6 +2242,12 @@ end subroutine flush_hvars
                hio_npp_si_pft  => this%hvars(ih_npp_si_pft)%r82d, &
                hio_npp_sec_si_pft      => this%hvars(ih_npp_sec_si_pft)%r82d, &
                hio_IMAP_eggs_si     => this%hvars(ih_IMAP_eggs_si)%r81d, & !testeggs
+               hio_IMAP_L1_si     => this%hvars(ih_IMAP_L1_si)%r81d, & !testeggs
+	       hio_IMAP_L2_si     => this%hvars(ih_IMAP_L2_si)%r81d, & !testeggs
+	       hio_IMAP_P_si     => this%hvars(ih_IMAP_P_si)%r81d, & !testeggs
+	       hio_IMAP_T_si     => this%hvars(ih_IMAP_T_si)%r81d, & !testeggs
+               hio_IMAP_FA_si     => this%hvars(ih_IMAP_FA_si)%r81d, & !testeggs
+               hio_IMAP_In_PopN_si     => this%hvars(ih_IMAP_In_PopN_si)%r81d, & !testeggs
                hio_nesterov_fire_danger_si => this%hvars(ih_nesterov_fire_danger_si)%r81d, &
                hio_fire_nignitions_si => this%hvars(ih_fire_nignitions_si)%r81d, &
                hio_fire_fdi_si => this%hvars(ih_fire_fdi_si)%r81d, &
@@ -2620,7 +2632,13 @@ end subroutine flush_hvars
          sites(s)%disturbance_rates_secondary_to_secondary(dtype_ifall)) *  &
          days_per_year
       !hio_IMAP_eggs_si(io_si)            =sites(s)%crownarea_canopy_damage
-      hio_IMAP_eggs_si(io_si)           = sites(s)%si_insect%Transit(1)!!! will need to normalize
+      hio_IMAP_eggs_si(io_si)          = sites(s)%si_insect%Transit(1)!!! will need to normalize
+      hio_IMAP_L1_si(io_si)            = sites(s)%si_insect%Transit(2)!!! will need to normalize
+      hio_IMAP_L2_si(io_si)            = sites(s)%si_insect%Transit(3)!!! will need to normalize
+      hio_IMAP_P_si(io_si)             = sites(s)%si_insect%Transit(4)!!! will need to normalize
+      hio_IMAP_T_si(io_si)             = sites(s)%si_insect%Transit(5)!!! will need to normalize
+      !hio_IMAP_FA_si(io_si)            = sites(s)%si_insect%Transit(5)!!! will need to normalize
+      hio_IMAP_In_PopN_si(io_si)       = sites(s)%si_insect%TInPopN  !!! will need to normalize
          
       hio_potential_disturbance_rate_si(io_si) = sum(sites(s)%potential_disturbance_rates(1:N_DIST_TYPES)) * days_per_year
 
@@ -6235,11 +6253,36 @@ end subroutine update_history_hifrq
          avgflag='A', vtype=site_r8, hlms='CLM:ALM', upfreq=2, &
          ivar=ivar, initialize=initialize_variables, index = ih_tveg_si )
     
-	call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
+    call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
              long='Insect Eggs per ha', &
              use_default='active', avgflag='A', vtype=site_r8,               &
              hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
              initialize=initialize_variables, index = ih_IMAP_eggs_si)
+    call this%set_history_var(vname='IMAP_Larvae_1', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_L1_si)
+    	call this%set_history_var(vname='IMAP_Larvae_2', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_L2_si)
+    call this%set_history_var(vname='IMAP_Pupae', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_P_si)
+    call this%set_history_var(vname='IMAP_Tadult', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_T_si)
+    call this%set_history_var(vname='IMAP_Insect_Population', units = 'kg m-2',       &
+             long='Insect Eggs per ha', &
+             use_default='active', avgflag='A', vtype=site_r8,               &
+             hlms='CLM:ALM', upfreq=1, ivar=ivar,                              &
+             initialize=initialize_variables, index = ih_IMAP_In_PopN_si)
 
    ! call this%set_history_var(vname='Eggs', units = 'kg m-2',       &
    !          long='Insect Eggs per ha', &
