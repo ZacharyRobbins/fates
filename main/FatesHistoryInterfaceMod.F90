@@ -408,7 +408,7 @@
   integer :: ih_IMAP_P_si
   integer :: ih_IMAP_T_si
   integer :: ih_IMAP_FA_si
-  integer :: ih_IMAP_In_PopN
+  integer :: ih_IMAP_In_PopN_si
   integer :: ih_nplant_si_scpf
   integer :: ih_gpp_si_scpf
   integer :: ih_npp_totl_si_scpf
