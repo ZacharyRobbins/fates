@@ -208,13 +208,13 @@ contains
         call satellite_phenology(currentSite, bc_in )
       end if ! SP phenology
     end if
-    if (hlm_use_ed_st3.eq.ifalse.) then 
+    if (hlm_use_ed_st3.eq.ifalse .and. hlm_use_insect.eq.itrue) then 
        !Insect plugin-ZR
        ! Don't run on bare patch, see sf. 
        if (currentSite%youngest_patch%patchno .ne. 0) then 
           call insect_model(currentSite, bc_in)
-      end if
-
+       end if
+    endif
 
     if (hlm_use_ed_st3.eq.ifalse.and.hlm_use_sp.eq.ifalse) then   ! Bypass if ST3
        
