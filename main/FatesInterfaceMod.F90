@@ -1394,7 +1394,7 @@ contains
          hlm_sf_scalar_lightning_def = unset_int
          hlm_sf_successful_ignitions_def = unset_int
          hlm_sf_anthro_ignitions_def = unset_int
-		 hlm_use_insect = unset_int
+         hlm_use_insect = unset_int
          hlm_use_planthydro = unset_int
          hlm_use_lu_harvest   = unset_int
          hlm_num_lu_harvest_cats   = unset_int
@@ -1831,17 +1831,17 @@ contains
                if (fates_global_verbose()) then
                   write(fates_log(),*) 'Transfering hlm_use_logging= ',ival,' to FATES'
                end if
-	        case('use_insect')
+            case('use_insect')
                hlm_use_insect = ival
                if (fates_global_verbose()) then
-	       write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-               write(fates_log(), *) ''
-               write(fates_log(), *) ' use_fates_IMAP is an      EXPERIMENTAL FEATURE        '
-               write(fates_log(), *) ' This is a check that the model is running'
-               write(fates_log(), *) ' for more information.'
-               write(fates_log(), *) ''
-               write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-               write(fates_log(),*) 'Transfering hlm_use_insect ',ival,' to FATES'
+                write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                write(fates_log(), *) ''
+                write(fates_log(), *) ' use_fates_insect is an      EXPERIMENTAL FEATURE        '
+                write(fates_log(), *) ' This is a check that the model is running'
+                write(fates_log(), *) ' for more information.'
+                write(fates_log(), *) ''
+                write(fates_log(), *) '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+                write(fates_log(),*) 'Transfering hlm_use_insect ',ival,' to FATES'
                end if
             case('use_ed_st3')
                hlm_use_ed_st3 = ival
