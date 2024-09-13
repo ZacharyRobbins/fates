@@ -704,7 +704,7 @@ contains
                          total_c  = sapw_c + struct_c + leaf_c + fnrt_c + store_c
 			 if(hlm_use_insect.eq.itrue)then
 	     	                 currentCohort%n = currentCohort%n * &
-							 min(1.0_r8,(currentCohort%inmort) * hlm_freq_day * fates_mortality_disturbance_fraction)
+							 (1-min(1.0_r8,(currentCohort%inmort) * hlm_freq_day * fates_mortality_disturbance_fraction))
 			 end if 
                          ! treefall mortality is the current disturbance
                          if(i_disturbance_type .eq. dtype_ifall) then
