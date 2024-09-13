@@ -13,7 +13,7 @@ module FatesInsectMemMod
 	integer,  parameter :: maxNumStages   = 20                    	! maximum number of stages for insect development
 	integer,  parameter :: maxpft = 14					! maximum number of plant pfts (I've manually entered the current number, which is inelegant...)
 	integer,  parameter :: insectType = 2  	! 1= MPB, 2=WPB 3=OtherType.
-
+        integer,  parameter :: PFTpref=1
 			
 		
 	real(r8), parameter :: r1 = 0.2009 			        ! Effective population of attack (portion of beetles to reach attacked tree). 
