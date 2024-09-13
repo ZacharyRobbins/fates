@@ -2633,7 +2633,7 @@ end subroutine flush_hvars
          days_per_year
       if(hlm_use_insect .eq. itrue) then
         !hio_IMAP_eggs_si(io_si)            =sites(s)%crownarea_canopy_damage
-         hio_IMAP_eggs_si(io_si)          = sites(s)%si_insect%Transit(1)!!! will need to normalize
+         hio_IMAP_eggs_si(io_si)          = currentSite%si_insect%indensity(1,2)!!! will need to normalize
          hio_IMAP_L1_si(io_si)            = sites(s)%si_insect%Transit(2)!!! will need to normalize
          hio_IMAP_L2_si(io_si)            = sites(s)%si_insect%Transit(3)!!! will need to normalize
          hio_IMAP_P_si(io_si)             = sites(s)%si_insect%Transit(4)!!! will need to normalize
