@@ -460,7 +460,7 @@ contains
 		real(kind = 8) :: tenpm           ! 10pm Temp
 		real(kind = 8) :: oneam             ! 1am Temp
 		real(kind = 8) :: Tmin2     ! the buffered under-bark minimum temperature
-		real(kind = 8) :: Tmax2     ! the warmer under bark maximum temperature
+		!real(kind = 8) :: Tmax2     ! the warmer under bark maximum temperature
 
  
 	       ! Variables that relate to the domain of the lognormal distribution
@@ -705,9 +705,9 @@ contains
 		call WPBAttack(NtGEQ317, NtGEQ00, Bt, FA, Parents, r1,x0,x1,CWDvec,x2,SizeFactor,In_PopN, EndPopn)
 		! This updates the density of trees in each of the size classes, and the density of beetles that remain in
 		!!! New parents wait 8 days to oviposit.
-		call EPTDev(n, avec, medA, muA, sigmaA, Tmin2,Mort_ETP, Parents, NewParentstm1, OPare, Pare, ActiveParents)
+		call EPTDev(n, avec, medA, muA, sigmaA, fouram,Mort_ETP, Parents, NewParentstm1, OPare, Pare, ActiveParents)
 		! Simulating oviposition:
-		call Ovipos(Fec, ActiveParents, med0, Tmin2,FecMax,Gen_mort,Mort_Fec, NewEggs)
+		call Ovipos(Fec, ActiveParents, med0, fouram,FecMax,Gen_mort,Mort_Fec, NewEggs)
 		! Th0e output of this subroutine (NewEggs) is input for the next subroutine below.
 		! The Ovipos subroutine also updates the scalar value for fecundity.
 		! It takes as input the number of parents which comes from an initial value
@@ -719,7 +719,7 @@ contains
 			E=E*.5
 		end if
 		! Simulating egg development:
-		call EPTDev(n, avec, med1, mu1, sigma1, Tmin2,Mort_ETP, NewEggs, NewEggstm1, OE, E, NewL1)
+		call EPTDev(n, avec, med1, mu1, sigma1, fouram,Mort_ETP, NewEggs, NewEggstm1, OE, E, NewL1)
 		! The output of this subroutine (NewL1) is input for the next subroutine below.
 		! This updates the aging distribution (OE) and NewEggstm1 and
 		! outputs a scalar for the expected number of eggs.
@@ -741,7 +741,7 @@ contains
 		! NewP = NewP*0.5
 
 		! Simulating pupal development:
-		call EPTDev(n, avec, med4, mu4, sigma4, Tmin2,Mort_ETP, NewP, NewPtm1, OP, P, NewT)
+		call EPTDev(n, avec, med4, mu4, sigma4, fouram,Mort_ETP, NewP, NewPtm1, OP, P, NewT)
 		! The output of this subroutine (NewT) is input for the next subroutine below.
 		! This updates the aging distribution (OP) and  NewPtm1 and
 		! outputs a scalar for the expected number of pupae (P).
@@ -753,7 +753,7 @@ contains
 		end if
 		! Simulating teneral adult development:
 
-		call EPTDev(n, avec, med5, mu5, sigma5, Tmin2,Mort_ETP, NewT, NewTtm1, OT, Te, NewA)
+		call EPTDev(n, avec, med5, mu5, sigma5, fouram,Mort_ETP, NewT, NewTtm1, OT, Te, NewA)
 		! The output of this subroutine (NewA) is input for the next subroutine below.
 		! This updates the aging distribution (OT) and  NewTtm1 and
 		! outputs a scalar for the expected number of teneral adults (Te).
@@ -765,7 +765,7 @@ contains
 		end if
 		! Simulating adult flight
 		! This updates the expected number of adults (A) and flying adults (FA).
-		call AdSR(NewA, Tmin2, mean_airTC,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
+		call AdSR(NewA, fouram, mean_airTC,Mort_Ads,FFTL,FFTH,FF1,FF2,FF3,FF4,FF5,FF6, A,FA)
 
 	end subroutine WPBSim
 		
