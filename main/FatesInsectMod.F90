@@ -97,7 +97,7 @@ contains
     real(r8) :: NewL2tm1                    	! density of new L2 in the previous time step (t minus 1)
     real(r8) :: NewPtm1                     	! density of new pupae in the previous time step (t minus 1)
     real(r8) :: NewTtm1                     	! density of new teneral adults in the previous time step (t minus 1)
-
+    
     real(r8) :: Fec                         	! the expected number of pre-eggs at each time per ha
     real(r8) :: E                           	! the expected number of eggs at each time per ha
     real(r8) :: L1                          	! the expected number of L1 at each time step per ha
@@ -229,7 +229,7 @@ contains
 			end if
 			if(hlm_current_month == 10 .and. hlm_current_day == 1 .and. In_PopN < EndPopn) then
 				! The endemic western pine beetle population because the parents of a new cohort.  
-				Parents = EndPopn
+				Pare = EndPopn
 			end if
 
 			!----------------------------------------------------------------------------------------------------
